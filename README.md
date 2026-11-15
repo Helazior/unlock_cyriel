@@ -34,6 +34,7 @@ js/fx.js              particules plein écran : cœurs, chauves-souris, étincel
 js/dessin.js          dessins partagés (cœur, chauve-souris)
 js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
+js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
 js/etapes/grotte.js   plan de la grotte : salles, galeries, obstacles, objets
 js/etapes/peintures.js  peintures des parois, dessinées en code
 js/etapes/a-venir.js  écran provisoire après la dernière étape codée
