@@ -6,7 +6,7 @@ d'étape. Il suffit de déposer ici un fichier portant le bon nom :
 | Étape | Fichier attendu |
 | --- | --- |
 | 1 — les deux boutons | `etape-1.mp3` |
-| 2 — la grotte | `etape-2.mp3` |
+| 2 — la grotte | `etape-2.mp3` (déjà là) |
 | 4 — la zone humide | `etape-4.mp3` (déjà là) |
 
 Tant qu'un fichier manque, l'étape se joue simplement sans musique de fond
@@ -30,3 +30,6 @@ Le volume général de l'ambiance se règle dans `js/son.js`
   fin et début fondus l'un dans l'autre sur 1,5 s pour que la boucle ne
   s'entende pas (durée finale : 21,9 s). Licence à vérifier avant toute mise en
   ligne publique.
+- `etape-2.mp3` : « Grotte 2 » (AMBUndr, ID 2136), La Sonothèque. Original de
+  71,4 s recoupé à 43 s, fin et début fondus sur 1,5 s, ré-encodé en
+  128 kbit/s (durée finale : 41,5 s, 650 Ko au lieu de 2,8 Mo).
