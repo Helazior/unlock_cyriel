@@ -37,8 +37,8 @@ js/dessin.js          dessins partagés (cœur, chauve-souris)
 js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
-js/etapes/etape4.js   étape 4 — le marais : chaque chenille sur sa plante hôte
-js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles et papillons
+js/etapes/etape4.js   étape 4 — le marais : cinq papillons pondent, on suit leurs petits à la loupe
+js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
 js/etapes/cafe-dessins.js  dessins de la salle du café et de la place du marché (en isométrique) et des personnages
 js/etapes/clins-doeil.js  Cyriel et Clément dessinés d'après photos, en clins d'œil dans la grotte, le marais, le café et le marché
@@ -76,6 +76,52 @@ atteignables, et affiche un plan en caractères.
 Tous les chemins sont relatifs : le dossier peut être servi tel quel depuis
 n'importe quel sous-dossier d'un site statique. La page demande aux moteurs de
 recherche de ne pas l'indexer.
+
+### Le marais (étape 4)
+
+Cinq femelles viennent pondre l'une après l'autre. Il faut trouver la plante
+hôte (une femelle goûte les plantes en tambourinant avec ses pattes), puis la
+loupe montre la suite, avec un petit jeu tiré de la vraie vie de l'espèce :
+
+| Papillon | Plante | Le petit jeu |
+| --- | --- | --- |
+| Paon du jour | grande ortie | nourrir la colonie dans sa toile ; ouvrir les ailes (ocelles) face à une mésange |
+| Aurore | alliaire (la cardamine porte déjà un œuf orange) | retrouver la chenille allongée contre une silique ; la chrysalide passe l'hiver |
+| Cuivré des marais | patience d'eau | « fenêtres » dans la feuille ; grimper au-dessus de la crue d'hiver |
+| Azuré des mouillères | gentiane pneumonanthe | choisir la fourmi qui l'adopte (Myrmica) ; réclamer à manger dans le nid |
+| Machaon | carotte sauvage | la chenille déguisée en fiente ; sortir les cornes orange face aux fourmis |
+
+Chaque papillon ajoute une page au carnet de terrain (bouton en haut à
+gauche). Les textes et les faits sont en tête de `js/etapes/etape4.js`
+(`TEXTES` et `ESPECES`). Le machaon doit rester le dernier : il porte le
+4e chiffre.
+
+Sources des faits naturalistes :
+
+- Paon du jour : [Wikipédia (en)](https://en.wikipedia.org/wiki/Aglais_io) ;
+  [SHNA, Atlas des papillons de Bourgogne](https://shna-ofab.fr/fichiers/bnhs13-cahiers-ld-p322-323-paon-du-jour_1449566332.pdf)
+  (chenilles grégaires dans une toile de soie, hivernage en grotte).
+- Aurore : [SHNA](https://ressources.shna-ofab.fr/fichiers/bnhs13-cahiers-ld-p192-193-aurore_1455631211.pdf)
+  (alliaire et cardamine, œuf qui vire à l'orange, chenilles cannibales,
+  chrysalide qui hiverne) ; [Wikipédia (en)](https://en.wikipedia.org/wiki/Anthocharis_cardamines)
+  (la femelle évite les fleurs déjà pondues) ;
+  [British insects, DELTA](https://www.delta-intkey.com/britin/pap/www/anthocha.htm)
+  (la chenille ressemble aux siliques).
+- Cuivré des marais : [SHNA](https://ressources.shna-ofab.fr/fichiers/bnhs13-cahiers-ld-p202-203-cuivre-des-marais_1455722517.pdf)
+  (patiences, protection nationale) ; [Naturalis, Butterflies of Europe](https://butterflies-europe.linnaeus.naturalis.nl/linnaeus_ng/app/views/species/taxon.php?id=114623)
+  (fenêtres dans les feuilles, hivernage au pied de la plante) ;
+  [Université de Birmingham](https://research.birmingham.ac.uk/en/publications/the-effects-of-flooding-on-survivorship-in-overwintering-larvae-o)
+  (survie aux crues, chenilles qui grimpent au sec).
+- Azuré des mouillères : [Département des Côtes-d'Armor](https://cotesdarmor.fr/sites/default/files/2020-12/AzureDesMouilleresCapErquy.pdf)
+  (comptage des œufs, Myrmica scabrinodis) et [synthèse Trame verte et bleue](https://trameverteetbleue.fr/sites/default/files/syntheses-bibliographiques-especes/131219_azure_des_mouilleres_sept2012.pdf)
+  (gentiane pneumonanthe, environ 10 mois dans le nid, protection) ;
+  [Wikipédia (en)](https://en.wikipedia.org/wiki/Phengaris_alcon)
+  (œufs blancs, femelle brune poudrée de bleu, mimétisme chimique, trophallaxie).
+- Machaon : [Wikipédia (en)](https://en.wikipedia.org/wiki/Papilio_machaon)
+  (ombellifères, jeune chenille en fiente, osmeterium) ;
+  [Scientific Reports 2023](https://www.nature.com/articles/s41598-023-33390-x)
+  (l'osmeterium repousse les fourmis, moins efficace contre les vertébrés).
+- Les femelles goûtent avec leurs pattes : [Nature Communications 2011](https://www.nature.com/articles/ncomms1548).
 
 ### Modifier le café
 
