@@ -137,6 +137,13 @@ En tête de `js/etapes/cafe.js` :
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix.
 - `TEXTES.fete` : la fin, où le gâteau du machaon est pour elle ; `age` donne
   les bougies en chiffres.
+- `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
+  marché) et leur volume.
+
+Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre. Chacun
+a sa carte en bas de l'écran (ce qui cuit, le minuteur, son bouton 60x).
+Toucher un fourneau libre ouvre le livre ; toucher un fourneau prêt pose le
+plat sur le comptoir.
 
 ## À compléter avant le 23
 
