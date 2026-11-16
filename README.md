@@ -37,8 +37,8 @@ js/dessin.js          dessins partagés (cœur, chauve-souris)
 js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
-js/etapes/etape4.js   étape 4 — le marais : cinq papillons pondent, on suit leurs petits à la loupe
-js/etapes/course.js   la petite course jusqu'au café, à la fin du marais (5 secondes)
+js/etapes/etape4.js   étape 4 — le marais : cinq papillons à faire pondre en même temps, avec des vies
+js/etapes/course.js   la petite course jusqu'au café, à la fin du marais (6 secondes après le départ)
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
 js/etapes/cafe-dessins.js  dessins de la salle du café et de la place du marché (en isométrique) et des personnages
@@ -80,17 +80,22 @@ recherche de ne pas l'indexer.
 
 ### Le marais (étape 4)
 
-Cinq femelles viennent pondre l'une après l'autre. Il faut trouver la plante
-hôte (une femelle goûte les plantes en tambourinant avec ses pattes), puis la
-loupe montre la suite, avec un petit jeu tiré de la vraie vie de l'espèce :
+Un petit jeu d'arcade où tout se passe en même temps. Cinq femelles arrivent
+coup sur coup (une toutes les 2 secondes) : on touche une femelle puis sa
+plante hôte (elle goûte en tambourinant avec ses pattes). Chaque ponte ouvre
+une loupe en haut de l'écran, où l'œuf devient chenille puis chrysalide
+pendant qu'on s'occupe des autres. Quand une loupe clignote en rouge, il faut
+la toucher à temps. Une femelle qu'on fait trop attendre, ou un danger raté,
+coûte une vie (5 vies) ; à zéro, l'étape recommence. Les durées sont dans
+`REGLES`, en tête de `js/etapes/etape4.js`, réglées pour rester faciles.
 
 | Papillon | Plante | Le petit jeu |
 | --- | --- | --- |
-| Paon du jour | grande ortie | nourrir la colonie dans sa toile ; ouvrir les ailes (ocelles) face à une mésange |
-| Aurore | alliaire (la cardamine porte déjà un œuf orange) | retrouver la chenille allongée contre une silique ; la chrysalide passe l'hiver |
-| Cuivré des marais | patience d'eau | « fenêtres » dans la feuille ; grimper au-dessus de la crue d'hiver |
+| Paon du jour | grande ortie | ouvrir les ailes (ocelles) face à une mésange |
+| Aurore | alliaire (la cardamine porte déjà un œuf orange) | la chenille se cache contre une silique face à un oiseau |
+| Cuivré des marais | patience d'eau | grimper au-dessus de la crue d'hiver |
 | Azuré des mouillères | gentiane pneumonanthe | choisir la fourmi qui l'adopte (Myrmica) ; réclamer à manger dans le nid |
-| Machaon | carotte sauvage | la chenille déguisée en fiente ; sortir les cornes orange face aux fourmis |
+| Machaon | carotte sauvage | sortir les cornes orange face aux fourmis |
 
 Chaque papillon ajoute une page au carnet de terrain (bouton en haut à
 gauche). Les textes et les faits sont en tête de `js/etapes/etape4.js`
