@@ -19,7 +19,8 @@ python3 -m http.server 8000
 | `?etape=2` | démarre directement à l'étape 2 (et s'en souvient) |
 | `?etape=1` | repart du début |
 | `?etape=2&debug=carte` | étape 2 avec toute la grotte révélée, pour vérifier le plan |
-| `?etape=5&debug=vite` | le café, avec tout 4 fois plus rapide (pour les essais) |
+| `?etape=4&debug=vite` | le marais, avec tout 4 fois plus rapide (pour les essais) |
+| `?etape=5&debug=vite` | le café, avec tout 4 fois plus rapide |
 
 La progression est gardée dans le navigateur ; l'adresse suit aussi l'étape en
 cours, donc `?etape=N` suffit pour reprendre sur un autre appareil.
@@ -36,13 +37,15 @@ js/dessin.js          dessins partagés (cœur, chauve-souris)
 js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
+js/etapes/etape4.js   étape 4 — le marais : chaque chenille sur sa plante hôte
+js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles et papillons
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, marché en tête de fichier)
 js/etapes/cafe-dessins.js  dessins du café, du marché et des personnages
 js/code.js            le code à 4 chiffres, utilisé par les étapes 2, 3 et 5
 js/chiffres.js        chiffres tracés au néon (celui de la grotte)
 js/etapes/grotte.js   plan de la grotte : salles, galeries, obstacles, objets
 js/etapes/peintures.js  peintures des parois, dessinées en code
-js/etapes/a-venir.js  écran provisoire pour une étape pas encore codée (l'étape 4)
+js/etapes/a-venir.js  écran provisoire, pour une étape pas encore codée (inutilisé)
 outils/               scripts de vérification
 polices/              police DynaPuff (licence libre OFL, voir le fichier joint)
 sons/                 musiques d'ambiance, à déposer (voir sons/LISEZMOI.md)
@@ -77,6 +80,5 @@ recherche de ne pas l'indexer.
 
 - **Le mot et le cadeau** : `TEXTES.lettre` et `TEXTES.cadeau`, en tête de
   `js/etapes/cafe.js`.
-- **Le code** : `js/code.js`. Les deux derniers chiffres sont provisoires
-  tant que l'étape 4 (les papillons) n'existe pas.
+- **Le code** : `js/code.js` (un chiffre par étape, de la grotte au machaon).
 - **Les musiques** : voir `sons/LISEZMOI.md`.
