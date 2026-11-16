@@ -82,10 +82,14 @@ En tête de `js/etapes/cafe.js` :
 
 - `TEXTES` : tout ce qui s'affiche, dont les commandes des clients
   (`TEXTES.commandes`) et les pseudos des joueurs du marché (`TEXTES.joueurs`) ;
-- `RECETTES` : ingrédients, gestes au fourneau et temps de cuisson ;
+- `RECETTES` : ingrédients, gestes au fourneau et temps de cuisson, en vraies
+  minutes comme dans le jeu d'origine (le bouton 60x les fait passer en autant
+  de secondes) ;
 - `CLIENTS` : la table, la recette et l'exigence de chaque client
   (`plus` : en plus de la recette, `sans` : à ne pas mettre) ;
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix.
+- `TEXTES.fete` : la fin, où le gâteau du machaon est pour elle ; `age` donne
+  les bougies en chiffres.
 
 ## À compléter avant le 23
 
