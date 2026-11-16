@@ -39,8 +39,8 @@ js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
 js/etapes/etape4.js   étape 4 — le marais : chaque chenille sur sa plante hôte
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles et papillons
-js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, marché en tête de fichier)
-js/etapes/cafe-dessins.js  dessins du café, du marché et des personnages
+js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
+js/etapes/cafe-dessins.js  dessins du café, de la place du marché (en isométrique) et des personnages
 js/code.js            le code à 4 chiffres, utilisé par les étapes 2, 3 et 5
 js/chiffres.js        chiffres tracés au néon (celui de la grotte)
 js/etapes/grotte.js   plan de la grotte : salles, galeries, obstacles, objets
@@ -75,6 +75,17 @@ atteignables, et affiche un plan en caractères.
 Tous les chemins sont relatifs : le dossier peut être servi tel quel depuis
 n'importe quel sous-dossier d'un site statique. La page demande aux moteurs de
 recherche de ne pas l'indexer.
+
+### Modifier le café
+
+En tête de `js/etapes/cafe.js` :
+
+- `TEXTES` : tout ce qui s'affiche, dont les commandes des clients
+  (`TEXTES.commandes`) et les pseudos des joueurs du marché (`TEXTES.joueurs`) ;
+- `RECETTES` : ingrédients, gestes au fourneau et temps de cuisson ;
+- `CLIENTS` : la table, la recette et l'exigence de chaque client
+  (`plus` : en plus de la recette, `sans` : à ne pas mettre) ;
+- `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix.
 
 ## À compléter avant le 23
 
