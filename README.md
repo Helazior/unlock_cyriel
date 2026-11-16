@@ -38,6 +38,7 @@ js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
 js/etapes/etape4.js   étape 4 — le marais : cinq papillons pondent, on suit leurs petits à la loupe
+js/etapes/course.js   la petite course jusqu'au café, à la fin du marais (5 secondes)
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
 js/etapes/cafe-dessins.js  dessins de la salle du café et de la place du marché (en isométrique) et des personnages
