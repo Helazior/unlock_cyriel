@@ -1294,6 +1294,49 @@ export function corpsAngeloune(assis = false) {
       <path d="M10.2 -23 Q11.4 -22 12.6 -23" stroke="#e0a688" stroke-width=".6" fill="none"/>`;
 }
 
+// Rachou, d'après sa photo : cheveux bruns courts et ébouriffés, lunettes de
+// soleil posées sur la tête, créoles dorées, chemise rose saumon à col.
+// Pas encore placée au marché : ajouter { rachou: true } dans LOOKS.
+export function corpsRachou(assis = false) {
+  const peau = '#eec4a6';
+  const cheveux = '#4a3226';
+  const reflet = '#7d553a';
+  const rose = '#f0918a';
+  const roseFonce = '#d9736e';
+  const or = '#e0b44c';
+  const jambes = assis
+    ? `<ellipse cx="-4" cy="-8" rx="4.4" ry="3" fill="#39415f"/><ellipse cx="4" cy="-8" rx="4.4" ry="3" fill="#39415f"/><ellipse cx="-6" cy="-5" rx="3" ry="2" fill="#3b2a52"/><ellipse cx="6" cy="-5" rx="3" ry="2" fill="#3b2a52"/>`
+    : `<rect x="-5.5" y="-10" width="4.4" height="9" rx="2" fill="#39415f"/><rect x="1.1" y="-10" width="4.4" height="9" rx="2" fill="#39415f"/><ellipse cx="-3.4" cy="-1" rx="3.4" ry="2" fill="#f4f1ea"/><ellipse cx="3.4" cy="-1" rx="3.4" ry="2" fill="#f4f1ea"/>`;
+  return `
+      ${jambes}
+      <path d="M-7.5 -19 Q-10 -15 -9.5 -11" stroke="${rose}" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="-9.4" cy="-10.4" r="2.4" fill="${peau}"/>
+      <path d="M7.5 -19 Q10 -15 9.5 -11" stroke="${rose}" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="9.4" cy="-10.4" r="2.4" fill="${peau}"/>
+      <path d="M-8 -9 Q-9 -21 -6 -23 H6 Q9 -21 8 -9 Z" fill="${rose}"/>
+      <path d="M-2.8 -23 L0 -18.4 L2.8 -23 Z" fill="${peau}"/>
+      <path d="M-6 -23.6 L-2.8 -23 L0 -18.4 L-3.6 -19.2 Z M6 -23.6 L2.8 -23 L0 -18.4 L3.6 -19.2 Z" fill="${rose}" stroke="${roseFonce}" stroke-width=".7" stroke-linejoin="round"/>
+      <path d="M0 -18 V-9.6" stroke="${roseFonce}" stroke-width=".7"/>
+      <circle cx="0" cy="-15.6" r=".55" fill="#fff"/><circle cx="0" cy="-12.4" r=".55" fill="#fff"/>
+      <circle cx="-10.1" cy="-32" r="2.2" fill="${peau}"/><circle cx="10.1" cy="-32" r="2.2" fill="${peau}"/>
+      <circle cx="-10.4" cy="-28.4" r="1.7" fill="none" stroke="${or}" stroke-width=".95"/><circle cx="10.4" cy="-28.4" r="1.7" fill="none" stroke="${or}" stroke-width=".95"/>
+      <ellipse cx="0" cy="-33" rx="10" ry="11" fill="${peau}"/>
+      <path d="M-10.6 -31.4 C-12.6 -36 -12 -42 -8.4 -44.6 C-8.6 -47 -5.6 -48.6 -3.2 -47.4 C-1.6 -49.8 2.6 -50 4.4 -47.8 C7.2 -48.8 10 -46.8 9.8 -44 C12.6 -41.6 12.6 -36 10.6 -31.4 C10.4 -34.4 9.4 -36.6 7.8 -38 C5.4 -39.8 2.4 -39 0 -40.4 C-2.6 -39 -5.8 -39.8 -7.8 -37.6 C-9.4 -36.2 -10.4 -34.2 -10.6 -31.4 Z" fill="${cheveux}"/>
+      <path d="M-9 -40 C-7 -43.4 -3.6 -44.6 -0.6 -44 M2 -45.6 C4.6 -45.8 7 -44.4 8.4 -42.2 M-10.2 -36.4 C-9.8 -38 -9 -39.2 -8 -40" stroke="${reflet}" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <path d="M-11.4 -36.6 l-1.6 -.8 M11.4 -36.6 l1.6 -.8 M-11 -39.4 l-1.4 -1.2 M11 -39.4 l1.4 -1.2" stroke="${cheveux}" stroke-width="1.2" stroke-linecap="round"/>
+      <g transform="rotate(-6 0 -44.6)">
+        <rect x="-7.4" y="-46.8" width="6" height="4.2" rx="2" fill="#5d6b7d" stroke="#c9ccd4" stroke-width=".8"/>
+        <rect x="1.4" y="-46.8" width="6" height="4.2" rx="2" fill="#5d6b7d" stroke="#c9ccd4" stroke-width=".8"/>
+        <path d="M-1.4 -45 Q0 -45.8 1.4 -45 M-7.4 -44.8 L-10 -42.6 M7.4 -44.8 L10 -42.6" stroke="#c9ccd4" stroke-width=".8" fill="none" stroke-linecap="round"/>
+        <path d="M-6.2 -45.8 L-4.6 -45.8 M2.6 -45.8 L4.2 -45.8" stroke="#fff" stroke-opacity=".6" stroke-width=".7" stroke-linecap="round"/>
+      </g>
+      <path d="M-6.6 -36.4 Q-4.4 -37.8 -2.2 -36.8 M2.2 -36.8 Q4.4 -37.8 6.6 -36.4" stroke="${cheveux}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <circle cx="-4" cy="-33" r="1.6" fill="#6b4a32" stroke="${ENCRE}" stroke-width=".7"/><circle cx="4" cy="-33" r="1.6" fill="#6b4a32" stroke="${ENCRE}" stroke-width=".7"/>
+      <circle cx="-4" cy="-33" r=".7" fill="${ENCRE}"/><circle cx="4" cy="-33" r=".7" fill="${ENCRE}"/>
+      <circle cx="-3.4" cy="-33.6" r=".45" fill="#fff"/><circle cx="4.6" cy="-33.6" r=".45" fill="#fff"/>
+      <path d="M0.3 -31.4 Q1.3 -29.6 0 -29.2" stroke="#d99c7c" stroke-width=".8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-6.8" cy="-28.8" rx="1.9" ry="1.1" fill="#ff9cb0" opacity=".5"/><ellipse cx="6.8" cy="-28.8" rx="1.9" ry="1.1" fill="#ff9cb0" opacity=".5"/>
+      <path d="M-3 -26.8 Q0 -24.6 3 -26.8" stroke="#a8384a" stroke-width="1.1" fill="none" stroke-linecap="round"/>`;
+}
+
 /** Un joueur du marché, origine aux pieds, avec son pseudo au-dessus. */
 function joueur(nom, look, { x, y, assis = false, coucou = false, flane = false, coeur = false }) {
   const { peau, cheveux, haut, bas, coiffe } = look;
@@ -1304,7 +1347,7 @@ function joueur(nom, look, { x, y, assis = false, coucou = false, flane = false,
     ? `<g class="e5-coucou"><path d="M7 -19 Q12 -24 13 -31" stroke="${haut}" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="13" cy="-32.5" r="2.7" fill="${peau}"/></g>`
     : `<path d="M7.5 -19 Q10 -15 9.5 -11" stroke="${haut}" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="9.4" cy="-10.4" r="2.5" fill="${peau}"/>`;
   const l = Math.round(16 + nom.length * 5.6);
-  const corps = look.clement ? `<g transform="scale(1.1)">${corpsClement(coucou)}</g>` : look.estel ? corpsEstel(assis) : look.chanel ? corpsChanel(assis) : look.angeloune ? corpsAngeloune(assis) : `
+  const corps = look.clement ? `<g transform="scale(1.1)">${corpsClement(coucou)}</g>` : look.estel ? corpsEstel(assis) : look.chanel ? corpsChanel(assis) : look.angeloune ? corpsAngeloune(assis) : look.rachou ? corpsRachou(assis) : `
       ${jambes}
       <path d="M-8 -9 Q-9 -21 -6 -23 H6 Q9 -21 8 -9 Z" fill="${haut}"/>
       <path d="M-7.5 -19 Q-10 -15 -9.5 -11" stroke="${haut}" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="-9.4" cy="-10.4" r="2.5" fill="${peau}"/>
