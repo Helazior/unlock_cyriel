@@ -41,7 +41,7 @@ js/etapes/etape4.js   étape 4 — le marais : chaque chenille sur sa plante hô
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles et papillons
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
 js/etapes/cafe-dessins.js  dessins du café, de la place du marché (en isométrique) et des personnages
-js/etapes/clins-doeil.js  Cyriel et Clément dessinés d'après photos, à glisser dans les décors (pas encore placés)
+js/etapes/clins-doeil.js  Cyriel et Clément dessinés d'après photos, en clins d'œil dans la grotte, le marais, le café et le marché
 js/code.js            le code à 4 chiffres, utilisé par les étapes 2, 3 et 5
 js/chiffres.js        chiffres tracés au néon (celui de la grotte)
 js/etapes/grotte.js   plan de la grotte : salles, galeries, obstacles, objets
