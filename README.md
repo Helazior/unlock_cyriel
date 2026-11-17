@@ -81,8 +81,9 @@ recherche de ne pas l'indexer.
 ### Le marais (étape 4)
 
 Un petit jeu d'arcade où tout se passe en même temps. Cinq femelles arrivent
-coup sur coup (une toutes les 2 secondes) : on touche une femelle puis sa
-plante hôte (elle goûte en tambourinant avec ses pattes). Chaque ponte ouvre
+coup sur coup (une toutes les 2 secondes) : on touche une femelle, on dit
+qui elle est (« Quel est ce papillon ? », trois noms au choix ; son nom
+reste ensuite écrit sous elle), puis on touche sa plante hôte (elle goûte en tambourinant avec ses pattes). Chaque ponte ouvre
 une loupe en haut de l'écran, où l'œuf devient chenille puis chrysalide
 pendant qu'on s'occupe des autres. Quand une loupe clignote en rouge, il faut
 la toucher à temps. Une femelle qu'on fait trop attendre, ou un danger raté,
