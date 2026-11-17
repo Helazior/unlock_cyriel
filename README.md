@@ -157,20 +157,31 @@ En tête de `js/etapes/cafe.js` :
   (`TEXTES.commandes`) et les pseudos des joueurs du marché (`TEXTES.joueurs`) ;
 - `RECETTES` : ingrédients, gestes au fourneau et temps de cuisson, en vraies
   minutes comme dans le jeu d'origine (le bouton 60x les fait passer en autant
-  de secondes) ;
-- `CLIENTS` : la table, la recette et l'exigence de chaque client
-  (`plus` : en plus de la recette, `sans` : à ne pas mettre) ;
+  de secondes), ce que laisse le client (`prix`), l'expérience (`xp`) et
+  l'épice facultative (`epice`). Les quatre premières (salade du jardin, soupe
+  à la tomate, omelette, mousse au chocolat) viennent de la maquette du livre ;
+  la mousse prend trois heures au frais, comme dans le jeu d'origine ;
+- `CLIENTS` : les joueurs du marché qui viennent manger, leur table, leur
+  recette et leur exigence (`plus` : en plus de la recette, `sans` : à ne pas
+  mettre). Il y a trois tables : les trois derniers attendent qu'une table se
+  libère. Le dernier client, c'est Clément, avec le machaon de l'étape 4 sur
+  l'épaule : il commande la spécialité ;
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix ;
+  `EPICES` : les épices (vanille, persil, basilic, piment), qui restent au
+  frigo et relèvent un plat au moment de cuisiner (`TEXTES.epice` : le bonus) ;
   `PIECES_DEPART` (30) : les pièces au départ. Les courses des trois premières
-  commandes coûtent 24 pièces, et chaque client content en laisse 10. À zéro,
-  on ne peut plus rien acheter ; si elle ne peut vraiment plus finir les
-  commandes, Pipistrelle propose de recommencer la partie (sans repasser par la
-  connexion).
-- `TEXTES.fete` : la fin, où le gâteau du machaon est pour elle ; `age` donne
+  commandes coûtent 19 pièces. À zéro, on ne peut plus rien acheter : la roue
+  de la fortune et le camion du chef font regagner des pièces ; si elle ne
+  peut vraiment plus finir les commandes, Pipistrelle propose aussi de
+  recommencer la partie (sans repasser par la connexion).
+- `SEGMENTS_ROUE` : les seize cases de la roue de la fortune (des pièces ou
+  des ingrédients) ; `TEXTES.roue`, `TEXTES.hourra`, `TEXTES.express`,
+  `TEXTES.garniture` : les fenêtres des maquettes.
+- `TEXTES.fete` : la fin, où le gâteau de Clément est pour elle ; `age` donne
   les bougies en chiffres.
 - `TEXTES.joueuse` : le nom dans le bandeau du haut ; `TEXTES.niveau` : le
   niveau dans la tasse (23, puis 24 quand elle souffle ses bougies) et la barre
-  d'expérience, qui monte à chaque client servi ; `TEXTES.chat` : le Café chat ;
+  d'expérience, qui monte à chaque client servi (de l'`xp` de sa recette) ; `TEXTES.chat` : le Café chat ;
   `TEXTES.hud` : les menus, dont ce que répond Pipistrelle quand on touche un
   bouton du décor (carte, réglages, porte, cadeau, toques…).
 - `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
@@ -204,19 +215,54 @@ dans le jeu d'origine. Le chat va dans le coin en bas à gauche, les plateaux
 d'actions dans le coin en bas à droite, et la salle (ou le marché) se cadre
 entre les deux. Les menus suivent alors la hauteur de l'écran. Le chat et les
 plateaux sont deux images (`images/hud/chat.webp` et `actions.webp`) ; le coin
-du chat, caché par les plateaux sur la maquette, a été reconstitué. En
-paysage, les vitrines des étals mettent tous leurs produits sur une rangée.
+du chat, caché par les plateaux sur la maquette, a été reconstitué.
 
 Le marché reprend la capture du jeu d'origine : un pré en losange, des murets
 de pierre aux coins, une fontaine à statue dans sa haie, des pas japonais, la
 girouette, la borne à incendie, le tableau d'affichage et son oiseau, le banc,
 l'oranger. Chaque étal a son dessin : la cabane de la crèmerie, les cagettes du
-primeur, le panneau lumineux de l'épicerie (guirlande et ballons), le kiosque
-de la cave (fanions, et un nid sur le toit). Les joueurs sont les mêmes
-qu'avant, et ils vivent : la plupart se promènent (leur parcours est dans
-`marche()`, `js/etapes/cafe-dessins.js`), Rachou sautille, Estel se balance
-sur le banc, Clément fait coucou. Le cadre du marché (`CADRE_MARCHE`) garde
-toujours les quatre étals et le panneau du café à l'écran.
+primeur, les étagères de l'épicerie, le kiosque de la cave (fanions, et un nid
+sur le toit). À droite, le stand de la roue de la fortune, avec sa guirlande
+et ses ballons PLAY. Les joueurs sont les mêmes qu'avant, et ils vivent : la
+plupart se promènent (leur parcours est dans `marche()`,
+`js/etapes/cafe-dessins.js`), Rachou sautille, Estel se balance sur le banc,
+Clément fait coucou. Ce sont aussi eux, les clients du café. Le cadre du
+marché (`CADRE_MARCHE`) garde toujours les étals, la roue et le panneau du café
+à l'écran.
+
+Les fenêtres reprennent les maquettes de Clément, traduites en français :
+
+- **La boutique** d'un étal (maquette « obchod s přísadami ») : la bourse, le
+  titre, ce qu'il y a au frigo, les onglets des quatre étals, le panier ou le
+  frigo à droite, et les cartes des aliments sur la table en bois : le prix,
+  le stock au frigo, acheter (le chariot) et revendre au même prix (la caisse,
+  grise s'il n'y en a pas). Le panier du bas, au café, ouvre la même fenêtre
+  sur le frigo.
+- **Le livre de recettes** : un livre ouvert, deux cartes par page (une
+  seule page sur un écran étroit, une carte par page sur un téléphone
+  couché), avec les flèches bleues pour tourner les pages. Chaque carte a ses
+  trois étoiles (une de plus à chaque plat servi), son plat et sa famille, les
+  portions, le temps, le prix et l'expérience, les ingrédients (grisés s'il en
+  manque au frigo), l'épice dans sa case fleurie, et le panier (il manque
+  quelque chose : direction le marché) ou le fouet (tout est là).
+- **La roue de la fortune** (le stand PLAY du marché) : le premier tour est
+  gratuit, puis il coûte une pièce, et il est offert si la bourse est vide
+  (pour pouvoir se débloquer). Le prix s'annonce dans la fenêtre « Hourra ! » :
+  les pièces vont dans la bourse, les aliments au frigo.
+- **Relever le plat** : quand l'épice de la recette est au frigo, au moment de
+  cuisiner, « Veux-tu relever ce plat avec de la vanille ? » ; oui : le client
+  laisse quelques pièces de plus et l'expérience monte un peu plus.
+- **Cuisiner tout de suite** : toucher un fourneau qui cuit propose de finir le
+  plat d'un coup, pour une pièce (25 fois par partie ; la toque est le bouton).
+- **Trouve la garniture** : le camion du chef pâtissier est garé à droite du
+  café ; on le touche, et le chef a caché de la confiture dans un de ses trois
+  cupcakes. Une partie coûte une pièce (offerte si la bourse est vide), la
+  garniture en rapporte trois.
+
+Les images des fenêtres sont dans `images/fenetres/` (découpées dans les
+maquettes, sans leurs textes) ; les textes français et les boutons sont posés
+par-dessus, en pixels de l'image (`MAQ` et `maquette()` dans
+`js/etapes/cafe.js`).
 
 Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre.
 Toucher un fourneau libre ouvre le livre. Au-dessus du fourneau, une bulle
@@ -226,7 +272,8 @@ de minuteur, avec le bouton 60x. Le plat prêt s'affiche dans la bulle : on
 touche pour le poser sur le comptoir. Quand plusieurs fourneaux travaillent,
 les bulles se rangent en escalier, reliées à leur fourneau par un trait.
 
-Le nom du bandeau est écrit en Patua One (`polices/`, licence OFL).
+Le nom du bandeau et les titres des fenêtres sont écrits en Patua One
+(`polices/`, licence OFL).
 
 ## À compléter avant le 23
 

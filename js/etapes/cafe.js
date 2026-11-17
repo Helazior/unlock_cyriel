@@ -7,16 +7,19 @@
 //   2. le livre de recettes dit quoi acheter ; au marché, on touche un étal
 //      pour ouvrir sa vitrine et acheter à l'unité (tout va au panier, puis
 //      au frigo) ;
-//   3. les clients s'installent et commandent, chacun avec son exigence
-//      (« double chocolat », « sans sucre »…) ;
+//   3. les clients (les joueurs du marché) s'installent et commandent,
+//      chacun avec son exigence (« deux œufs », « sans oignon »…) ;
 //   4. au fourneau, le livre s'ouvre : on choisit la commande, on met dans la
 //      casserole les bons ingrédients du frigo. Puis la bulle du fourneau
 //      demande les ingrédients, puis chaque étape (on touche le fourneau) ;
 //      la barre se remplit, et la cuisson démarre, avec son minuteur et son
 //      bouton 60x au-dessus du fourneau. Il y a trois fourneaux : pendant
 //      qu'un plat cuit, on en lance un autre ;
-//   5. Pipistrelle sert. Un client très spécial (un machaon) commande la
-//      spécialité, puis laisse le mot de Clément et le cadeau.
+//   5. Pipistrelle sert. Le dernier client, Clément, commande la spécialité,
+//      puis laisse son mot et le cadeau.
+//
+// La roue de la fortune (au marché) et le camion du chef pâtissier (à droite
+// du café) font gagner des pièces ou des ingrédients : de quoi se débloquer.
 //
 // Les aliments qu'elle déteste sont vendus au marché. Si elle en met dans la
 // casserole, le plat part quand même et le client trouve ça affreux, comme
@@ -79,13 +82,15 @@ const TEXTES = {
   // Ce que dit Pipistrelle, la serveuse.
   retour: 'Te revoilà, cheffe ! Tu veux relire ton mot, ou rejouer une partie ?',
   intro: 'Bienvenue dans ton café, cheffe Cyriel ! Moi, c’est Pipistrelle, ta serveuse. Ce soir, on rouvre.',
-  livre: 'Le frigo est vide… Regarde d’abord le livre de recettes, pour savoir quoi acheter.',
+  livre: (plats) => `Le frigo est vide… Les premiers clients ont réservé ${plats}. Regarde dans le livre de recettes ce qu’il faut acheter !`,
   versMarche: 'Allons au marché faire les courses !',
   marche: 'Touche un étal pour voir ce qu’il vend. Le livre de recettes et le panier (ton frigo) sont en bas à droite.',
   astuceMarche: 'Le livre de recettes, en bas à droite, dit tout ce qu’il faut acheter.',
   achatDeteste: (a) => `${cap(a.partitif)} ? Tu es sûre ? Bon… c’est toi la cheffe.`,
-  pasAssez: 'Plus assez de pièces ! Sers d’abord des clients : ils paient en partant.',
-  bloquee: 'Oh non… il ne reste plus assez de pièces pour finir les commandes. On recommence la partie ?',
+  pasAssez: 'Plus assez de pièces ! Sers d’abord des clients (ils paient en partant), ou tente ta chance à la roue de la fortune.',
+  bloquee: 'Oh non… il ne reste plus assez de pièces pour finir les commandes. Tente ta chance à la roue de la fortune, au marché, ou au camion du chef pâtissier, à droite du café ! Sinon, on peut recommencer la partie.',
+  astuceRoue: 'Psst ! La roue de la fortune, à droite du marché, fait gagner des pièces et des ingrédients.',
+  astuceCamion: 'Tiens, le camion du chef pâtissier est garé à droite du café : touche-le pour jouer à « Trouve la garniture » !',
   manqueEncore: (liste) => `Il manque encore ${liste}. On rentre quand même ?`,
   rangement: 'Je range les courses au frigo…',
   ouverture: 'On ouvre ! Les premiers clients arrivent.',
@@ -102,37 +107,47 @@ const TEXTES = {
   pretSpecial: (n) => `Le gâteau est prêt sur le fourneau ${n} ! Touche-le pour le sortir du four.`,
   service: 'Je l’apporte !',
   calme: 'Ouf, tout le monde est servi.',
-  special: 'Oh ! Un client très spécial… Il commande la spécialité de la maison. Sa recette vient d’apparaître dans le livre !',
+  special: 'Oh ! Regarde qui arrive : Clément ! Il commande la spécialité de la maison. Sa recette vient d’apparaître dans le livre !',
   commandeSpeciale: 'Touche un fourneau pour préparer la spécialité.',
 
   // La fin : le gâteau est pour elle, avec ses bougies.
   fete: {
     age: 24,   // les bougies en chiffres ; null pour cinq bougies classiques
-    attends: 'Attends… le machaon me chuchote quelque chose à l’oreille.',
-    surprise: 'Surprise ! Ce gâteau, le machaon ne l’a pas commandé pour lui… Il est pour toi !',
+    attends: 'Attends… Clément me chuchote quelque chose à l’oreille.',
+    surprise: 'Surprise ! Ce gâteau, Clément ne l’a pas commandé pour lui… Il est pour toi !',
     pourMoi: 'Pour moi ?!',
     allumer: 'Je m’occupe des bougies…',
     souffler: 'Joyeux anniversaire, Cyriel ! Fais un vœu, puis souffle tes bougies : touche les flammes.',
-    bravo: 'Bravo ! Et ce n’est pas fini : le machaon t’a apporté autre chose…',
+    bravo: 'Bravo ! Et ce n’est pas fini : Clément t’a apporté autre chose…',
     objets: 'Une enveloppe et un cadeau, rien que pour toi.',
     banniere: ['Joyeux anniversaire', 'Cyriel !'],
     ariaGateau: 'Ton gâteau d’anniversaire : touche les bougies pour les souffler',
   },
   fin: 'Le café est à toi, cheffe. Reviens quand tu veux !',
 
-  // Les commandes, avec l'exigence de chaque client.
+  // Les commandes des joueurs du marché, avec l'exigence de chacun (leurs
+  // pseudos sont dans joueurs, plus haut).
   commandes: {
-    herisson: 'Un chocolat chaud, avec double chocolat : je suis très gourmand !',
-    grenouille: 'Une tarte à la rhubarbe, mais sans sucre : je surveille ma ligne.',
-    loutre: 'Des crêpes à la crème de marron… avec du chocolat en plus !',
-    machaon: 'La spécialité de la maison, s’il te plaît : le gâteau rhubarbe et crème de marron.',
+    bichette: 'Une omelette bien baveuse, avec deux œufs : j’ai une faim de loup !',
+    chachoux: 'Des crêpes à la crème de marron… avec du chocolat en plus, stp !',
+    estel: 'Une salade du jardin, mais sans oignon : j’ai un rendez-vous juste après !',
+    gaston: 'Une soupe à la tomate, avec double crème : il fait froid en Haute-Loire !',
+    angeloune: 'Une mousse au chocolat, mais sans crème : comme la recette de ma grand-mère !',
+    rachou: 'Une tarte à la rhubarbe, mais sans sucre : je fais attention à ma ligne.',
+    clement: 'La spécialité de la maison, s’il te plaît : le gâteau rhubarbe et crème de marron.',
   },
   // Quand un ingrédient interdit est dans la casserole.
   rappels: {
-    grenouille: 'La grenouille a bien dit : sans sucre !',
+    estel: 'Estelou a bien dit : sans oignon !',
+    angeloune: 'Angelounette a bien dit : sans crème !',
+    rachou: 'Rachou a bien dit : sans sucre !',
   },
 
   recettes: {
+    salade: { nom: 'Salade du jardin', dans: 'une salade du jardin', cuit: 'La salade se prépare…' },
+    soupe: { nom: 'Soupe à la tomate', dans: 'une soupe à la tomate', cuit: 'La soupe mijote…' },
+    omelette: { nom: 'Omelette', dans: 'une omelette', cuit: 'L’omelette dore dans la poêle…' },
+    mousse: { nom: 'Mousse au chocolat', dans: 'une mousse au chocolat', cuit: 'La mousse prend au frais… pendant trois heures ! Touche le fourneau pour la finir tout de suite.' },
     chocolat: { nom: 'Chocolat chaud', dans: 'un chocolat chaud', cuit: 'Le chocolat chauffe…' },
     tarte: { nom: 'Tarte à la rhubarbe', dans: 'une tarte à la rhubarbe', cuit: 'La tarte dore au four…' },
     crepes: { nom: 'Crêpes à la crème de marron', dans: 'des crêpes', cuit: 'Les crêpes dorent dans la poêle…' },
@@ -143,6 +158,7 @@ const TEXTES = {
     ingredients: 'Ajouter les ingrédients',
     remuer: 'Remuer', etaler: 'Étaler la pâte', enfourner: 'Enfourner',
     verser: 'Verser la pâte', retourner: 'Retourner la crêpe', melanger: 'Mélanger',
+    couper: 'Couper les légumes', battre: 'Battre les œufs', plier: 'Plier l’omelette', fondre: 'Faire fondre le chocolat',
   },
 
   // La vérification de la casserole.
@@ -180,15 +196,22 @@ const TEXTES = {
     secretTitre: 'Spécialité de la maison',
     secret: 'Recette réservée à un client très spécial…',
     portions: 'Portions : 1',
-    pret: (min) => `Prête en : ${min} min`,
+    pret: (t) => `Prête en : ${t}`,
     parPortion: (n) => `${n} par portion`,
     inconnu: 'Prête en : ???',
+    epice: (a) => `Épice (facultative) : ${a.nom}`,
+    etoiles: (n) => (n ? `Servie ${n} fois ce soir` : 'Pas encore servie ce soir'),
+    toutLa: 'Tout est au frigo : touche un fourneau pour cuisiner !',
+    manque: 'Il manque des ingrédients : direction le marché !',
+    avant: 'Page précédente',
+    apres: 'Page suivante',
+    page: (n, total) => `${n} / ${total}`,
     commande: 'La commande',
     totalFrigo: (n) => `Au frigo : <b>${n}</b>`,
     reste: (n) => `${n} au frigo`,
   },
   frigo: { titre: 'Frigo', vide: 'Le frigo est vide. Les courses se font au marché !' },
-  boutique: { acheter: 'Acheter', auFrigo: 'Au frigo :' },
+  boutique: { acheter: 'Acheter', vendre: 'Revendre', auFrigo: 'Au frigo :', bourse: 'Tes pièces', etals: 'Les étals du marché', vitrine: 'La vitrine', cadeau: 'Cadeau' },
 
   // Le Café chat, en bas à gauche.
   chat: {
@@ -201,7 +224,7 @@ const TEXTES = {
   },
   // Le niveau dans la tasse, en haut à gauche : il passe à « fin » quand
   // elle souffle ses bougies. L'expérience monte à chaque client servi.
-  niveau: { depart: 23, fin: 24, xp: 510, xpMax: 684, xpSuivant: 760, parClient: 40 },
+  niveau: { depart: 23, fin: 24, xp: 510, xpMax: 684, xpSuivant: 760 },
 
   // Les menus. Les boutons du décor font répondre Pipistrelle (messages).
   hud: {
@@ -239,6 +262,62 @@ const TEXTES = {
     fouetFerme: 'Le café n’a pas encore ouvert !',
     fouetMarche: 'Les fourneaux sont au café : rentre pour cuisiner.',
     fouetRien: 'Rien à cuisiner pour l’instant.',
+  },
+
+  // Les fenêtres faites d'après les maquettes de Clément (images/fenetres/).
+  // La roue de la fortune : le stand aux ballons PLAY, au marché.
+  roue: {
+    aria: 'Roue de la fortune',
+    titre: 'Roue de la fortune !',
+    sousTitre: 'Fais tourner la roue et gagne de super prix !',
+    gratuit: 'Le premier tour est gratuit !',
+    offert: 'Bourse vide ? Ce tour est offert !',
+    prix: 'Un tour coûte 1 pièce.',
+    bouton: 'Faire tourner !',
+    libre: 'gratuit',
+  },
+  // La carte des prix gagnés.
+  hourra: {
+    titre: 'Hourra !',
+    bravo: 'Félicitations !',
+    frigo: 'Ton prix se trouve dans ton frigo !',
+    bourse: 'Tes pièces sont dans ta bourse !',
+    ok: 'OK',
+  },
+  // Relever un plat avec son épice (celle du livre : vanille, persil…),
+  // si elle est au frigo : le client laisse quelques pièces de plus, et
+  // l'expérience monte un peu plus vite.
+  epice: {
+    question: (a) => `Veux-tu relever ce plat avec ${a.partitif} ?`,
+    oui: 'oui',
+    non: 'non',
+    xp: 5,
+    pieces: 4,
+    miam: (client, a) => `${client} adore la touche ${a.de} !`,
+  },
+  // Cuisiner tout de suite : on touche un fourneau qui cuit.
+  express: {
+    question: 'Cuisiner tout de suite ?',
+    encore: (n) => `Encore possible ${n} fois !`,
+    fini: 'Plus possible ce soir !',
+    pasAssez: 'Il te faut 1 pièce !',
+    utiliser: 'Cuisiner tout de suite pour 1 pièce',
+    non: 'non',
+    fois: 25,
+  },
+  // Le petit jeu du camion du chef pâtissier, garé à droite du café.
+  garniture: {
+    aria: 'Camion du chef pâtissier : Trouve la garniture !',
+    titre: 'Trouve la garniture !',
+    consigne: 'Le chef a caché de la confiture dans un seul de ses cupcakes. Touche une flèche pour choisir !',
+    partie: 'Une partie :',
+    offerte: 'Bourse vide : partie offerte !',
+    gagne: 'Miam, délicieux ! Tu as trouvé la garniture ! Réessaie tout de suite.',
+    rate: 'Raté ! Réessaie !',
+    pieces: 'Tes pièces',
+    cout: 1,
+    prix: 3,
+    cupcake: (n) => `Cupcake ${n} : choisir`,
   },
 
   ariaEnveloppe: 'Enveloppe laissée par le client',
@@ -294,37 +373,62 @@ const TEXTES = {
 // gestes : ce qu'on fait au fourneau, un toucher par geste.
 // cuisson : en vraies minutes, comme dans le jeu d'origine ; le bouton 60x
 // la fait passer en autant de secondes.
+// prix : ce que laisse le client (par portion) ; xp : l'expérience gagnée ;
+// epice : facultative, elle relève le plat (voir TEXTES.epice).
+// Les quatre premières viennent de la maquette du livre de Clément.
 const RECETTES = {
-  chocolat: { plat: 'tasse', ingredients: { lait: 1, chocolat: 1 }, gestes: ['remuer'], cuisson: 5 },
-  tarte: { plat: 'tarte', ingredients: { farine: 1, beurre: 1, sucre: 1, rhubarbe: 1 }, gestes: ['etaler', 'enfourner'], cuisson: 12, four: true },
-  crepes: { plat: 'crepes', ingredients: { farine: 1, oeufs: 1, lait: 1, marron: 1 }, gestes: ['verser', 'retourner'], cuisson: 8 },
-  gateau: { plat: 'gateau', ingredients: { rhubarbe: 1, farine: 1, oeufs: 1, sucre: 1, marron: 1 }, gestes: ['melanger', 'enfourner'], cuisson: 15, four: true, secret: true },
+  salade: { plat: 'saladier', categorie: 'feuille', ingredients: { tomates: 1, oignon: 1, salade: 1 }, gestes: ['couper', 'melanger'], cuisson: 3, prix: 9, xp: 18, epice: 'persil' },
+  soupe: { plat: 'soupe', categorie: 'louche', ingredients: { tomates: 1, oignon: 1, creme: 1 }, gestes: ['couper', 'remuer'], cuisson: 10, prix: 10, xp: 22, epice: 'basilic' },
+  omelette: { plat: 'omelette', categorie: 'plat', ingredients: { oeufs: 1 }, gestes: ['battre', 'plier'], cuisson: 1, prix: 6, xp: 12, epice: 'piment' },
+  mousse: { plat: 'mousse', categorie: 'dessert', ingredients: { oeufs: 1, chocolat: 1, creme: 1 }, gestes: ['fondre', 'battre'], cuisson: 180, prix: 14, xp: 30, epice: 'vanille' },
+  chocolat: { plat: 'tasse', categorie: 'boisson', ingredients: { lait: 1, chocolat: 1 }, gestes: ['remuer'], cuisson: 5, prix: 10, xp: 20, epice: 'vanille' },
+  tarte: { plat: 'tarte', categorie: 'dessert', ingredients: { farine: 1, beurre: 1, sucre: 1, rhubarbe: 1 }, gestes: ['etaler', 'enfourner'], cuisson: 12, four: true, prix: 12, xp: 26, epice: 'vanille' },
+  crepes: { plat: 'crepes', categorie: 'dessert', ingredients: { farine: 1, oeufs: 1, lait: 1, marron: 1 }, gestes: ['verser', 'retourner'], cuisson: 8, prix: 14, xp: 28, epice: 'vanille' },
+  gateau: { plat: 'gateau', categorie: 'dessert', ingredients: { rhubarbe: 1, farine: 1, oeufs: 1, sucre: 1, marron: 1 }, gestes: ['melanger', 'enfourner'], cuisson: 15, four: true, prix: 0, xp: 0, secret: true },
 };
 const ACCELERATION = 60;
 
-// Les clients, leur table et leur commande : plus = en plus de la recette,
-// sans = à ne surtout pas mettre.
+// Les clients (les joueurs du marché), leur table et leur commande : plus =
+// en plus de la recette, sans = à ne surtout pas mettre. Trois tables : les
+// trois derniers attendent qu'une table se libère.
 const CLIENTS = [
-  { sorte: 'herisson', table: 1, recette: 'chocolat', plus: { chocolat: 1 } },
-  { sorte: 'grenouille', table: 0, recette: 'tarte', sans: ['sucre'] },
-  { sorte: 'loutre', table: 2, recette: 'crepes', plus: { chocolat: 1 } },
+  { sorte: 'bichette', table: 1, recette: 'omelette', plus: { oeufs: 1 } },
+  { sorte: 'chachoux', table: 0, recette: 'crepes', plus: { chocolat: 1 } },
+  { sorte: 'estel', table: 2, recette: 'salade', sans: ['oignon'] },
+  { sorte: 'gaston', table: 1, recette: 'soupe', plus: { creme: 1 } },
+  { sorte: 'angeloune', table: 0, recette: 'mousse', sans: ['creme'] },
+  { sorte: 'rachou', table: 2, recette: 'tarte', sans: ['sucre'] },
 ];
-const ARRIVEES = [600, 5200, 6400];   // millisecondes avant chaque arrivée
+const ARRIVEES = [600, 5200, 6400, 2500, 3500, 3500];   // millisecondes avant chaque arrivée
+// Les joueurs du marché, dans l'ordre de TEXTES.joueurs (pour leurs pseudos).
+const SORTES = ['clement', 'chachoux', 'estel', 'gaston', 'bichette', 'angeloune', 'rachou'];
 
 // Les aliments que Cyriel n'aime pas : vendus au marché comme les autres.
 const DETESTES = ['poivron', 'aubergine', 'gingembre', 'coriandre', 'balsamique', 'vin', 'champagne', 'huitres'];
+// Les épices (à l'épicerie, ou gagnées à la roue) : elles restent au frigo,
+// et servent à relever un plat au moment de cuisiner (voir RECETTES).
+const EPICES = ['vanille', 'persil', 'basilic', 'piment'];
+
+// Les cases de la roue de la fortune (k : 'pieces' ou un aliment, n : combien).
+const SEGMENTS_ROUE = [
+  { k: 'pieces', n: 5 }, { k: 'chocolat', n: 1 }, { k: 'vanille', n: 1 }, { k: 'tomates', n: 2 },
+  { k: 'pieces', n: 10 }, { k: 'oeufs', n: 2 }, { k: 'persil', n: 1 }, { k: 'pieces', n: 5 },
+  { k: 'creme', n: 1 }, { k: 'marron', n: 1 }, { k: 'basilic', n: 1 }, { k: 'farine', n: 2 },
+  { k: 'pieces', n: 20 }, { k: 'piment', n: 1 }, { k: 'vanille', n: 1 }, { k: 'rhubarbe', n: 1 },
+];
 
 // Chaque étal a son dessin au marché (cabane, cagettes, panneau, kiosque) ;
 // couleur : son store et le haut de sa vitrine, fonce : son enseigne.
 const ETALS = [
-  { cle: 'primeur', nom: 'Primeur', couleur: '#e8553a', fonce: '#b33a20', articles: ['rhubarbe', 'poivron', 'aubergine', 'coriandre', 'gingembre'] },
-  { cle: 'epicerie', nom: 'Épicerie', couleur: '#8f5cf7', fonce: '#6a3fd0', articles: ['farine', 'sucre', 'chocolat', 'marron', 'balsamique'] },
-  { cle: 'cremerie', nom: 'Crèmerie', couleur: '#3ea6c9', fonce: '#1f7896', articles: ['lait', 'oeufs', 'beurre'] },
+  { cle: 'primeur', nom: 'Primeur', couleur: '#e8553a', fonce: '#b33a20', articles: ['tomates', 'oignon', 'salade', 'rhubarbe', 'poivron', 'aubergine', 'coriandre', 'gingembre'] },
+  { cle: 'epicerie', nom: 'Épicerie', couleur: '#8f5cf7', fonce: '#6a3fd0', articles: ['farine', 'sucre', 'chocolat', 'marron', 'persil', 'basilic', 'piment', 'balsamique'] },
+  { cle: 'cremerie', nom: 'Crèmerie', couleur: '#3ea6c9', fonce: '#1f7896', articles: ['lait', 'oeufs', 'beurre', 'creme'] },
   { cle: 'cave', nom: 'Cave et marée', couleur: '#e39b2d', fonce: '#a8641a', articles: ['vin', 'champagne', 'huitres'] },
 ];
 
 const PRIX = {
   rhubarbe: 3, farine: 1, sucre: 1, marron: 4, chocolat: 3, oeufs: 2, lait: 1, beurre: 2,
+  tomates: 2, oignon: 1, salade: 2, creme: 2, persil: 1, basilic: 1, piment: 1,
   poivron: 2, aubergine: 2, gingembre: 2, coriandre: 1, balsamique: 4, vin: 5, champagne: 9, huitres: 6,
 };
 
@@ -335,22 +439,39 @@ const SONS = {
   marche: { fichier: 'sons/cafe-marche.mp3', volume: 1 },
 };
 
-// Les courses des trois premières commandes coûtent 24 pièces : il reste un
-// peu de marge pour une erreur ou deux.
+// Les courses des trois premières commandes coûtent 19 pièces : il reste de
+// la marge pour une erreur ou deux (et la roue, le camion, si ça coince).
 const PIECES_DEPART = 30;
-const PAIEMENT = 10;        // ce que laisse un client content
-const PAIEMENT_BEURK = 2;   // … et un client dégoûté
+const PAIEMENT_BEURK = 2;   // ce que laisse un client dégoûté
 const VITESSE_MARCHE = 95;  // pixels du décor par seconde
 const NS = 'http://www.w3.org/2000/svg';
 const L = D.LIEUX;
 const ORDRE = Object.keys(D.ARTICLES);
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// … et les espaces avant ! ? : ; » (et après «) deviennent insécables.
+const fr = (t) => esc(t).replace(/ ([!?:;»])/g, '\u00a0$1').replace(/« /g, '«\u00a0');
 const recette = (cle) => ({ ...RECETTES[cle], ...TEXTES.recettes[cle] });
+const nomDe = (sorte) => TEXTES.joueurs[SORTES.indexOf(sorte)];
 const icone = (k) => `<svg viewBox="-24 -24 48 48" aria-hidden="true">${D.ARTICLES[k].dessin()}</svg>`;
 const ICONE_PIECE = `<svg viewBox="-12 -12 24 24" aria-hidden="true">${D.pieceSeule()}</svg>`;
-const ICONE_FRIGO = `<svg viewBox="-12 -12 24 24" aria-hidden="true">${D.iconeFrigo()}</svg>`;
-const ICONE_PANIER = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-9 -6 H-6 L-3.6 4 H6.4 L8.6 -3.4 H-5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="-2" cy="7.6" r="1.8" fill="#fff"/><circle cx="5" cy="7.6" r="1.8" fill="#fff"/></svg>`;
+// Les icônes de la boutique et du livre, comme dans les maquettes.
+const ICONE_CHARIOT = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-10 -7 H-6.6 L-3.8 5 H6.8 L9.2 -3.6 H-5.4" fill="none" stroke="#5a2a0e" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M-10 -7 H-6.6 L-3.8 5 H6.8 L9.2 -3.6 H-5.4" fill="none" stroke="#f2832e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M-4.6 -0.6 H8" stroke="#f2832e" stroke-width="1.4"/><circle cx="-2.2" cy="8.4" r="2" fill="#f2832e" stroke="#5a2a0e" stroke-width="1"/><circle cx="5.6" cy="8.4" r="2" fill="#f2832e" stroke="#5a2a0e" stroke-width="1"/></svg>`;
+const ICONE_CAISSE = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-6.4" y="-10" width="12.8" height="7.6" rx="1.2" fill="#fffdf6" stroke="#5a3a1a" stroke-width="1.3"/><path d="M-3.6 -6.2 H3.6" stroke="#5a3a1a" stroke-width="1.2"/><path d="M-10 -1.6 H10 L9 9 H-9 Z" fill="#fffdf6" stroke="#5a3a1a" stroke-width="1.3" stroke-linejoin="round"/><path d="M-6 2 H-2.4 M1 2 H6 M-6 5.4 H-2.4 M1 5.4 H6" stroke="#5a3a1a" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+const ICONE_FRIGO_BLEU = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><rect x="-7.4" y="-11" width="14.8" height="22" rx="2.6" fill="#e3edf5" stroke="#6f8aa0" stroke-width="1.3"/><path d="M-7.4 -3.4 H7.4" stroke="#6f8aa0" stroke-width="1.1"/><path d="M4.2 -8.4 V-5.6 M4.2 -0.4 V5" stroke="#6f8aa0" stroke-width="1.5" stroke-linecap="round"/><path d="M-5 -9 V9" stroke="#fff" stroke-width="1.6" opacity=".85"/></svg>`;
+const ICONE_FOUET = `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M7 7 L-2 -3" stroke="#5a3a1a" stroke-width="4.6" stroke-linecap="round"/><path d="M7 7 L-2 -3" stroke="#c98a4e" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="-5" cy="-6" rx="5.4" ry="3.6" transform="rotate(45 -5 -6)" fill="#d9a066" stroke="#5a3a1a" stroke-width="1.2"/><path d="M-11 0 Q-14 -8 -8 -12 M11 -2 Q13 -9 7 -11" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".9"/></svg>`;
+const ICONE_BOUTIQUE = `<svg viewBox="-30 -27 60 52" aria-hidden="true">
+  <defs><radialGradient id="e5-halo-boutique"><stop offset=".55" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <ellipse cx="1" cy="1" rx="29" ry="25" fill="url(#e5-halo-boutique)"/>
+  <path d="M-15 -8 H17 V9 Q17 16 9 16 H-7 Q-15 16 -15 9 Z" fill="#c4c8cd" stroke="#6f747c" stroke-width="1.4"/>
+  <path d="M17 -2 Q23 -2 23 3 Q23 8 17 8" fill="none" stroke="#6f747c" stroke-width="2.4"/>
+  <path d="M-11 -6 V10" stroke="#e8ebee" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M-17 -8 Q1 -22 19 -8 Z" fill="#d6d9dd" stroke="#6f747c" stroke-width="1.4" stroke-linejoin="round"/>
+  <ellipse cx="1" cy="-17" rx="4.2" ry="3" fill="#d6d9dd" stroke="#6f747c" stroke-width="1.2"/>
+  <path d="M-23 -1 H-17 V-7 H-11 V-1 H-5 V5 H-11 V11 H-17 V5 H-23 Z" fill="#e8453c" stroke="#a8261e" stroke-width="1.2" stroke-linejoin="round"/>
+  <g transform="rotate(-14 9 7)"><rect x="0" y="0" width="17" height="10" rx="1.2" fill="#b6dd5a" stroke="#6f9a2a" stroke-width="1.1"/><circle cx="8.5" cy="5" r="2.6" fill="none" stroke="#6f9a2a" stroke-width="1"/></g>
+  <g fill="#f2c94c" stroke="#b9862a" stroke-width="1"><ellipse cx="-3" cy="17" rx="7.4" ry="2.6"/><ellipse cx="-3" cy="13.6" rx="7.4" ry="2.6"/><ellipse cx="-2" cy="10.2" rx="7.4" ry="2.6"/><ellipse cx="7" cy="12" rx="2.8" ry="7"/></g>
+</svg>`;
 
 // « du beurre, du sucre et de la rhubarbe »
 function listeNoms(cles) {
@@ -551,11 +672,12 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       ${D.tables()}
       <g class="e5-calque-tables"></g>
       ${D.decorAvant()}
+      ${D.camion(TEXTES.garniture.aria)}
       <g class="e5-calque-volants"></g>
       <g class="e5-calque-bulles"></g>
     </g>
     <g class="e5-vue" data-vue="marche" style="visibility:hidden">
-      ${D.marche(ETALS, TEXTES.joueurs, TEXTES.panneauCafe)}
+      ${D.marche(ETALS, TEXTES.joueurs, TEXTES.panneauCafe, TEXTES.roue.aria)}
     </g>
     <g class="e5-guidage" pointer-events="none">
       <g class="e5-halo" style="display:none"><ellipse class="e5-halo-anim" rx="40" ry="32" fill="none" stroke="#9b6bff" stroke-width="3"/></g>
@@ -722,6 +844,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     racine.dataset.mise = paysage ? 'paysage' : 'portrait';
     const u = paysage ? Math.max(0.34, Math.min(h / 1050, 0.62)) : Math.max(0.3, Math.min(l / 912, h / 1724, 0.62));
     racine.style.setProperty('--u', `${u.toFixed(4)}px`);
+    racine.style.setProperty('--zl', `${l}px`);
+    racine.style.setProperty('--zh', `${h}px`);
     // L'espace libre pour la salle : sous le bandeau, et au choix au-dessus
     // des menus du bas, entre le chat et les plateaux, ou au-dessus des
     // plateaux en laissant le chat de côté. On garde celui où elle est la
@@ -1002,14 +1126,373 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   }
   function fermerFenetre() { if (fenetreCourante) fenetreCourante.fermer(null); }
 
+  /* ----------------------------------- Les fenêtres d'après les maquettes */
+
+  // L'image de chaque fenêtre (images/fenetres/, sans ses textes tchèques) et,
+  // par-dessus, les textes en français et les boutons, placés en pixels de
+  // l'image : [x0, y0, x1, y1]. --t : la taille du texte, en % de la largeur.
+  const MAQ = {
+    roue: { l: 539, h: 588 },
+    hourra: { l: 415, h: 407 },
+    epice: { l: 432, h: 419, image: 'vanille' },
+    express: { l: 432, h: 288 },
+    garniture: { l: 532, h: 588 },
+  };
+  const ici = (m, [x0, y0, x1, y1], t = 0) => `left:${((x0 / m.l) * 100).toFixed(2)}%;top:${((y0 / m.h) * 100).toFixed(2)}%;width:${(((x1 - x0) / m.l) * 100).toFixed(2)}%;height:${(((y1 - y0) / m.h) * 100).toFixed(2)}%${t ? `;--t:${t}` : ''}`;
+
+  // dessus : la fenêtre s'ouvre par-dessus la fenêtre en cours (le « Hourra ! »
+  // sur la roue), sans la fermer. ctrl.bloque : on ne peut pas la fermer
+  // (la roue qui tourne).
+  function maquette(nom, { genre = nom, aria, html, dessus = false }) {
+    const m = MAQ[nom];
+    if (!dessus) fermerFenetre();
+    const f = document.createElement('div');
+    f.className = `e5-fenetre e5-fen-maq e5-fen-${nom}${dessus ? ' e5-sur' : ''}`;
+    f.innerHTML = `
+      <div class="e5-maq" role="dialog" aria-modal="true" aria-label="${esc(aria)}" tabindex="-1" style="--l:${m.l};--h:${m.h}">
+        <img class="e5-maq-fond" src="images/fenetres/${m.image || nom}.webp" alt="" draggable="false">
+        ${html}
+      </div>`;
+    zone.append(f);
+    const cadre = f.firstElementChild;
+    let resoudre;
+    const avant = document.activeElement;
+    const ctrl = {
+      genre,
+      el: f,
+      cadre,
+      m,
+      resultat: new Promise((r) => { resoudre = r; }),
+      ferme: false,
+      bloque: false,
+      fermer(valeur = null) {
+        if (ctrl.ferme) return;
+        ctrl.ferme = true;
+        if (fenetreCourante === ctrl) fenetreCourante = null;
+        animer(f, [{ opacity: 1 }, { opacity: 0 }], { duree: 160, garder: false }).then(() => f.remove());
+        f.style.pointerEvents = 'none';
+        if (dessus) {
+          const retour = avant && avant.isConnected && avant !== document.body && !avant.disabled ? avant : fenetreCourante?.cadre;
+          retour?.focus({ preventScroll: true });
+        }
+        resoudre(valeur);
+      },
+    };
+    const fermer = () => { if (!ctrl.bloque) ctrl.fermer(null); };
+    for (const b of f.querySelectorAll('.e5-mcroix')) b.addEventListener('click', () => { if (!ctrl.bloque) bip('clic', 0.3); fermer(); });
+    f.addEventListener('click', (e) => { if (e.target === f) fermer(); });
+    f.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); fermer(); } });
+    animer(f, [{ opacity: 0 }, { opacity: 1 }], { duree: 160, garder: false });
+    animer(cadre, [{ transform: 'translateY(10px) scale(.92)' }, { transform: 'none' }], { duree: 280, easing: 'cubic-bezier(.3,1.4,.5,1)', garder: false });
+    if (!dessus) fenetreCourante = ctrl;
+    cadre.focus({ preventScroll: true });
+    return ctrl;
+  }
+  const croix = (m, b) => `<button type="button" class="e5-m e5-mcroix" style="${ici(m, b)}" aria-label="${esc(TEXTES.boutons.fermer)}"></button>`;
+
+  // Un dessin d'aliment ou de pièce, pour les fenêtres et les envols.
+  const dessinPrix = (k) => (k === 'pieces' ? { dessin: D.pieceSeule(), boite: '-12 -12 24 24' } : { dessin: D.ARTICLES[k].dessin(), boite: '-24 -24 48 48' });
+
+  // « Hourra ! » : le prix gagné (à la roue, au camion du chef).
+  function hourra(k, n, message) {
+    const m = MAQ.hourra;
+    const H = TEXTES.hourra;
+    const p = dessinPrix(k);
+    const f = maquette('hourra', {
+      dessus: true,
+      aria: `${H.titre} ${message}`,
+      html: `
+        <p class="e5-m e5-mtitre e5-rouge" style="${ici(m, [92, 20, 324, 74], 11.5)}">${fr(H.titre)}</p>
+        <p class="e5-m e5-mtexte" style="${ici(m, [100, 82, 316, 108], 4.4)}">${fr(H.bravo)}</p>
+        <p class="e5-m e5-mtexte" style="${ici(m, [80, 110, 336, 180], 4.4)}">${fr(message)}</p>
+        <svg class="e5-m e5-mprix" style="${ici(m, [163, 200, 247, 284])}" viewBox="${p.boite}" aria-hidden="true">${p.dessin}</svg>
+        <p class="e5-m e5-mtitre" style="${ici(m, [146, 292, 266, 328], 6.6)}">× ${n}</p>
+        <button type="button" class="e5-m e5-mbouton" data-e5="hourra-ok" style="${ici(m, [151, 347, 255, 383], 5)}">${esc(H.ok)}</button>`,
+    });
+    f.el.querySelector('[data-e5="hourra-ok"]').addEventListener('click', () => { bip('clic', 0.5); f.fermer(true); });
+    animer(f.el.querySelector('.e5-mprix'), [{ transform: 'scale(.2) rotate(-30deg)' }, { transform: 'scale(1.15) rotate(6deg)', offset: 0.7 }, { transform: 'none' }], { duree: 620, easing: 'ease-out', garder: false });
+    bip('eclat');
+    return f.resultat;
+  }
+
+  // Le prix arrive : les pièces dans la bourse, les aliments au frigo.
+  function encaisser(k, n, de) {
+    if (k === 'pieces') {
+      return envolee(D.pieceSeule(), de, centre(bourseIcone), { taille: 30, boite: '-12 -12 24 24', duree: 650 })
+        .then(() => { ajouterPieces(n); bip('piece'); });
+    }
+    frigo.set(k, nb(k) + n);
+    majBadge();
+    if (achats) for (let i = 0; i < n; i++) achats.push(k);
+    return envolee(D.ARTICLES[k].dessin(), de, centre(panier), { duree: 650, taille: 36 }).then(() => rebondir(panier));
+  }
+
+  /* ---------------------------------------------- La roue de la fortune */
+
+  // Le stand aux ballons PLAY, au marché. Le premier tour est gratuit, puis
+  // un tour coûte une pièce, sauf si la bourse est vide : il est offert,
+  // pour pouvoir se débloquer.
+  let toursDeRoue = 0;
+  let angleRoue = 0;
+  const N_ROUE = SEGMENTS_ROUE.length;
+  function roueSvg() {
+    const pas = 360 / N_ROUE;
+    const R = 158;
+    const rad = (a) => ((a - 90) * Math.PI) / 180;
+    const pt = (a, r) => `${(Math.cos(rad(a)) * r).toFixed(1)} ${(Math.sin(rad(a)) * r).toFixed(1)}`;
+    const quartiers = SEGMENTS_ROUE.map((s, i) => {
+      const a0 = (i - 0.5) * pas;
+      const a1 = (i + 0.5) * pas;
+      const couleur = i % (N_ROUE / 4) === 0 && i % (N_ROUE / 2) !== 0 ? '#e2412d' : i % 2 ? '#fde58c' : '#f07a2a';
+      const p = dessinPrix(s.k);
+      const taille = s.k === 'pieces' ? 26 : 34;
+      const nombre = s.k === 'pieces' || s.n > 1 ? `<text y="${taille / 2 + 11}" text-anchor="middle" font-size="12" font-weight="700" fill="#5a2a12" stroke="#fff6dc" stroke-width="2.6" paint-order="stroke">${s.k === 'pieces' ? s.n : `×${s.n}`}</text>` : '';
+      return `<g data-i="${i}">
+        <path class="e5-roue-part" d="M0 0 L${pt(a0, R)} A${R} ${R} 0 0 1 ${pt(a1, R)} Z" fill="${couleur}"/>
+        <g transform="rotate(${(i * pas).toFixed(2)}) translate(0 -112)">
+          <svg x="${-taille / 2}" y="${-taille / 2}" width="${taille}" height="${taille}" viewBox="${p.boite}" overflow="visible">${p.dessin}</svg>${nombre}
+        </g>
+      </g>`;
+    }).join('');
+    return `
+      <g class="e5-roue-disque">
+        <circle r="${R + 1}" fill="#fff5d6"/>
+        ${quartiers}
+        <circle r="${R}" fill="none" stroke="#c9b48a" stroke-width="2"/>
+        <circle r="13" fill="#4a4a52"/><circle r="13" fill="url(#e5-moyeu)"/><circle cx="-4" cy="-5" r="3.4" fill="#fff" opacity=".55"/>
+      </g>
+      <defs><radialGradient id="e5-moyeu" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#9a9aa6"/><stop offset="1" stop-color="#2a2a30"/></radialGradient></defs>
+      <g class="e5-roue-aiguille">
+        <path d="M0 -146 L-9 -168 Q-10 -180 0 -184 Q10 -180 9 -168 Z" fill="#e8ebef" stroke="#6f747c" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M-3 -174 Q-2 -179 2 -180" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>`;
+  }
+
+  function fenetreRoue() {
+    const m = MAQ.roue;
+    const T = TEXTES.roue;
+    const f = maquette('roue', {
+      genre: 'roue',
+      aria: T.titre,
+      html: `
+        <p class="e5-m e5-mtitre" style="${ici(m, [70, 8, 444, 50], 6.4)}">${fr(T.titre)}</p>
+        ${croix(m, [480, 4, 534, 58])}
+        <p class="e5-m e5-mtexte e5-gras" style="${ici(m, [52, 84, 486, 124], 3.4)}">${fr(T.sousTitre)}</p>
+        <svg class="e5-m e5-roue" style="${ici(m, [99, 162, 439, 502])}" viewBox="-170 -170 340 340" role="img" aria-label="${esc(T.aria)}">${roueSvg()}</svg>
+        <p class="e5-m e5-mnote" style="${ici(m, [14, 494, 178, 566], 3.5)}"></p>
+        <button type="button" class="e5-m e5-mbouton" data-e5="roue-tourner" style="${ici(m, [190, 518, 348, 556], 3.7)}">${fr(T.bouton)}</button>`,
+    });
+    const disque = f.el.querySelector('.e5-roue-disque');
+    const note = f.el.querySelector('.e5-mnote');
+    const bouton = f.el.querySelector('[data-e5="roue-tourner"]');
+    disque.style.transform = `rotate(${angleRoue}deg)`;
+    const prixTour = () => (toursDeRoue === 0 || pieces === 0 ? 0 : 1);
+    const majNote = () => { note.innerHTML = fr(toursDeRoue === 0 ? T.gratuit : pieces === 0 ? T.offert : T.prix); };
+    majNote();
+
+    async function tourner() {
+      if (f.bloque || f.ferme) return;
+      const cout = prixTour();
+      if (cout > pieces) { bip('non'); secouer(bourse); return; }
+      f.bloque = true;
+      bouton.disabled = true;
+      if (cout) ajouterPieces(-cout);
+      toursDeRoue += 1;
+      bip('clic', 0.7);
+      // Un peu d'aide quand la bourse est presque vide : plus de chances de
+      // tomber sur des pièces.
+      const aPieces = SEGMENTS_ROUE.map((s, i) => [s, i]).filter(([s]) => s.k === 'pieces').map(([, i]) => i);
+      const gagnant = pieces < 5 && Math.random() < 0.6
+        ? aPieces[Math.floor(Math.random() * aPieces.length)]
+        : Math.floor(Math.random() * N_ROUE);
+      const pas = 360 / N_ROUE;
+      const depart = angleRoue;
+      const vise = -gagnant * pas + (Math.random() - 0.5) * pas * 0.6;
+      const arrivee = depart - (((depart - vise) % 360) + 360) % 360 + 360 * 5;
+      const duree = 4300 / V;
+      const a = disque.animate([{ transform: `rotate(${depart}deg)` }, { transform: `rotate(${arrivee}deg)` }], { duration: duree, easing: 'cubic-bezier(.15,.75,.2,1)', fill: 'forwards' });
+      // le cliquetis de l'aiguille à chaque case
+      let derniere = Math.floor((depart + pas / 2) / pas);
+      const cliquetis = () => {
+        if (!vivant || a.playState === 'finished') return;
+        const t = Math.min(1, (a.currentTime || 0) / duree);
+        const e = 1 - (1 - t) ** 3;
+        const ang = depart + (arrivee - depart) * e;
+        const c = Math.floor((ang + pas / 2) / pas);
+        if (c !== derniere) { derniere = c; bip('tic'); }
+        requestAnimationFrame(cliquetis);
+      };
+      requestAnimationFrame(cliquetis);
+      try { await a.finished; } catch { /* fenêtre fermée */ }
+      angleRoue = ((arrivee % 360) + 360) % 360;
+      disque.style.transform = `rotate(${angleRoue}deg)`;
+      a.cancel();
+      if (!vivant) return;
+      const s = SEGMENTS_ROUE[gagnant];
+      const part = disque.querySelector(`[data-i="${gagnant}"] .e5-roue-part`);
+      part.classList.add('e5-gagnant');
+      bip('ding');
+      await dormir(700);
+      await hourra(s.k, s.n, s.k === 'pieces' ? TEXTES.hourra.bourse : TEXTES.hourra.frigo);
+      part.classList.remove('e5-gagnant');
+      await encaisser(s.k, s.n, centre(f.el.querySelector('.e5-roue')));
+      f.bloque = false;
+      bouton.disabled = false;
+      if (!f.el.contains(document.activeElement)) bouton.focus({ preventScroll: true });
+      majNote();
+      fenetreCourante?.majTotal?.();
+    }
+    bouton.addEventListener('click', tourner);
+    surToucher(f.el.querySelector('.e5-roue'), tourner);
+    return f.resultat;
+  }
+
+  /* ------------------------------------- Relever le plat avec son épice */
+
+  function proposerEpice(k) {
+    const m = MAQ.epice;
+    const T = TEXTES.epice;
+    const a = D.ARTICLES[k];
+    const f = maquette('epice', {
+      aria: T.question(a),
+      html: `
+        ${croix(m, [384, 0, 432, 48])}
+        <p class="e5-m e5-mtitre" style="${ici(m, [50, 40, 366, 138], 6.2)}">${fr(T.question(a))}</p>
+        ${k === 'vanille' ? '' : `<div class="e5-m e5-mplaque" style="${ici(m, [161, 172, 248, 236])}"><svg viewBox="-24 -24 48 48" aria-hidden="true">${a.dessin()}</svg></div>`}
+        <p class="e5-m e5-mgain" style="${ici(m, [184, 252, 270, 282], 4.4)}">+ ${T.xp}</p>
+        <svg class="e5-m" style="${ici(m, [145, 286, 173, 314])}" viewBox="-12 -12 24 24" aria-hidden="true">${D.pieceSeule()}</svg>
+        <p class="e5-m e5-mgain" style="${ici(m, [184, 286, 270, 314], 4.4)}">+ ${T.pieces}</p>
+        <button type="button" class="e5-m e5-mbouton" data-e5="epice-oui" style="${ici(m, [62, 362, 162, 396], 4.4)}">${esc(T.oui)}</button>
+        <button type="button" class="e5-m e5-mbouton e5-orange" data-e5="epice-non" style="${ici(m, [250, 362, 352, 396], 4.4)}">${esc(T.non)}</button>`,
+    });
+    f.el.querySelector('[data-e5="epice-oui"]').addEventListener('click', () => { bip('clic', 0.7); f.fermer(true); });
+    f.el.querySelector('[data-e5="epice-non"]').addEventListener('click', () => { bip('clic', 0.3); f.fermer(false); });
+    return f.resultat.then((v) => v === true);
+  }
+
+  /* ------------------------------------------ Cuisiner tout de suite */
+
+  let expressRestant = TEXTES.express.fois;
+  function proposerExpress(feu) {
+    const m = MAQ.express;
+    const T = TEXTES.express;
+    const f = maquette('express', {
+      aria: T.question,
+      html: `
+        ${croix(m, [384, 0, 432, 48])}
+        <p class="e5-m e5-mtitre" style="${ici(m, [50, 46, 382, 104], 6.4)}">${fr(T.question)}</p>
+        <p class="e5-m e5-mtitre e5-mencore" style="${ici(m, [50, 124, 382, 182], 6.4)}">${fr(T.encore(expressRestant))}</p>
+        <button type="button" class="e5-m e5-mtoque" data-e5="express-oui" style="${ici(m, [56, 198, 138, 268])}" aria-label="${esc(T.utiliser)}"></button>
+        <p class="e5-m e5-mfois" style="${ici(m, [138, 200, 176, 222], 3.6)}" aria-hidden="true">×1</p>
+        <button type="button" class="e5-m e5-mbouton e5-orange" data-e5="express-non" style="${ici(m, [252, 226, 354, 258], 4.2)}">${esc(T.non)}</button>`,
+    });
+    f.el.querySelector('[data-e5="express-non"]').addEventListener('click', () => { bip('clic', 0.3); f.fermer(false); });
+    f.el.querySelector('[data-e5="express-oui"]').addEventListener('click', () => {
+      if (feu.etat !== 'cuisson') { f.fermer(false); return; }
+      if (pieces < 1) {
+        bip('non');
+        secouer(bourse);
+        const l = f.el.querySelector('.e5-mencore');
+        l.innerHTML = fr(T.pasAssez);
+        secouer(l);
+        return;
+      }
+      ajouterPieces(-1);
+      expressRestant -= 1;
+      feu.fait = feu.total;
+      bip('eclat');
+      const c = versEcran(feu.lieu.casserole.x, feu.lieu.casserole.y - 10);
+      if (vivant) fx.etincelles(c.x, c.y, 14, '#ffd27a', 90);
+      f.fermer(true);
+    });
+    return f.resultat;
+  }
+
+  /* -------------------------------- Le camion : « Trouve la garniture » */
+
+  // Le chef pâtissier a caché de la confiture dans un de ses trois cupcakes.
+  // Une partie coûte une pièce (offerte si la bourse est vide) ; trouver la
+  // garniture en rapporte trois.
+  const CUPCAKES = [120, 267, 414];   // le milieu de chaque cupcake, dans l'image
+  function fenetreGarniture() {
+    const m = MAQ.garniture;
+    const T = TEXTES.garniture;
+    const fleche = (x, i) => `
+      <g class="e5-gfleche" style="--i:${i}" transform="translate(${x} 289)"><g class="e5-gsaut">
+        <path d="M-7.5 -47 Q-7.5 -51 -3.5 -51 H3.5 Q7.5 -51 7.5 -47 V-23 H14.5 Q18 -23 15.6 -19.6 L1.8 -2.2 Q0 0 -1.8 -2.2 L-15.6 -19.6 Q-18 -23 -14.5 -23 H-7.5 Z" fill="#f4bb4f" stroke="#a46d27" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M0 -44 V-27" stroke="#fde6a6" stroke-width="2.6" stroke-dasharray="2.6 4.2" stroke-linecap="round"/>
+        <path d="M0 0 V12" stroke="#4e3a2c" stroke-width="1.6"/>
+      </g></g>`;
+    const confiture = (x, i) => `
+      <g class="e5-gconfiture" data-i="${i}" transform="translate(${x} 318)"><g class="e5-gcoule">
+        <path d="M-25 2 C-22 -8 -12 -12 0 -12 C12 -12 22 -8 25 2 C26 8 22 10 20 16 C18 24 13 25 12 17 C11 11 7 11 6 20 C5 31 -2 31 -2 21 C-2 13 -7 12 -9 18 C-11 25 -17 24 -17 16 C-17 10 -26 9 -25 2 Z" fill="#d42a3d" stroke="#97142a" stroke-width="1.6"/>
+        <path d="M-14 -5 Q-5 -9 6 -7" stroke="#ff8c9a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="13" cy="-2" r="2" fill="#ff8c9a"/>
+      </g></g>`;
+    const f = maquette('garniture', {
+      genre: 'garniture',
+      aria: T.titre,
+      html: `
+        <p class="e5-m e5-mtitre" style="${ici(m, [104, 12, 420, 46], 4.6)}">${fr(T.titre)}</p>
+        ${croix(m, [474, 20, 530, 74])}
+        <p class="e5-m e5-mcompte" style="${ici(m, [66, 109, 136, 131], 3.4)}" aria-label="${esc(T.pieces)}"></p>
+        <svg class="e5-m e5-gscene" style="${ici(m, [0, 0, 532, 588])}" viewBox="0 0 532 588" aria-hidden="true">
+          ${CUPCAKES.map(confiture).join('')}${CUPCAKES.map(fleche).join('')}
+        </svg>
+        ${CUPCAKES.map((x, i) => `<button type="button" class="e5-m e5-gchoix" data-i="${i}" data-e5="cupcake-${i}" style="${ici(m, [x - 62, 232, x + 62, 434])}" aria-label="${esc(T.cupcake(i + 1))}"></button>`).join('')}
+        <p class="e5-m e5-mtexte e5-gras e5-gprix" style="${ici(m, [92, 446, 350, 506], 4)}"></p>`,
+    });
+    const compte = f.el.querySelector('.e5-mcompte');
+    const prix = f.el.querySelector('.e5-gprix');
+    const confitures = [...f.el.querySelectorAll('.e5-gconfiture')];
+    const scene = f.el.querySelector('.e5-gscene');
+    const majPrix = () => {
+      compte.textContent = String(pieces);
+      prix.innerHTML = pieces === 0 ? fr(T.offerte) : `${fr(T.partie)} <b>${T.cout}</b> ${ICONE_PIECE}`;
+    };
+    majPrix();
+    direUnInstant(T.consigne);
+
+    async function choisir(i) {
+      if (f.bloque || f.ferme) return;
+      const cout = pieces === 0 ? 0 : T.cout;
+      f.bloque = true;
+      scene.classList.add('e5-gjoue');
+      if (cout) ajouterPieces(-cout);
+      majPrix();
+      bip('clic', 0.6);
+      const bonne = Math.floor(Math.random() * 3);
+      const btn = f.el.querySelector(`.e5-gchoix[data-i="${i}"]`);
+      btn.classList.add('e5-choisi');
+      await dormir(450);
+      confitures[bonne].classList.add('e5-montre');
+      if (i === bonne) {
+        bip('miam');
+        const c = centre(btn);
+        coeurs(c.x, c.y - 20, 8);
+        await dormir(700);
+        await hourra('pieces', T.prix, T.gagne);
+        await encaisser('pieces', T.prix, centre(btn));
+      } else {
+        bip('non');
+        prix.innerHTML = fr(T.rate);
+        await dormir(1500);
+      }
+      if (!vivant) return;
+      confitures[bonne].classList.remove('e5-montre');
+      btn.classList.remove('e5-choisi');
+      scene.classList.remove('e5-gjoue');
+      f.bloque = false;
+      majPrix();
+    }
+    for (const b of f.el.querySelectorAll('.e5-gchoix')) b.addEventListener('click', () => choisir(+b.dataset.i));
+    return f.resultat;
+  }
+
+  // Le frigo (bouton du panier, ou le frigo de la salle) : la vitrine de la
+  // boutique, sur l'onglet du frigo.
   function fenetreFrigo() {
-    const presents = ORDRE.filter((k) => nb(k) > 0);
-    const corps = presents.length
-      ? `<div class="e5-grille">${presents.map((k) => `
-          <div class="e5-case" role="img" aria-label="${esc(D.ARTICLES[k].nom)} : ${nb(k)}">${icone(k)}<b>${nb(k)}</b><span>${esc(D.ARTICLES[k].nom)}</span></div>`).join('')}</div>`
-      : `<p class="e5-vide">${esc(TEXTES.frigo.vide)}</p>`;
-    const total = presents.reduce((x, k) => x + nb(k), 0);
-    return fenetre({ titre: TEXTES.frigo.titre, couleur: '#4aa3df', genre: 'frigo', classe: 'e5-boutique e5-fen-frigo', corps, sousTitre: TEXTES.livreTexte.totalFrigo(total) });
+    return fenetreBoutique(null);
   }
 
   // Le livre et le panier (le frigo), en bas à droite : consultables à tout
@@ -1017,7 +1500,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   function boutonHaut(genre, ouvrir) {
     return () => {
       if (enTransition) return;
-      if (fenetreCourante?.genre === 'cuisine') return;
+      if (fenetreCourante?.genre === 'cuisine' || fenetreCourante?.bloque) return;
       bip('clic', 0.5);
       if (fenetreCourante?.genre === genre) { fermerFenetre(); return; }
       ouvrir();
@@ -1035,7 +1518,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     const v = D.visage(sorte);
     return `<svg class="${cls}" viewBox="${v.boite}" aria-hidden="true">${v.dessin}</svg>`;
   }
-  const nomClient = (cmd) => (cmd.special ? D.MACHAON.nom : D.PERSONNAGES[cmd.sorte].nom);
+  const nomClient = (cmd) => nomDe(cmd.sorte);
 
   function demandeHtml(cmd, { avecRecette = false } = {}) {
     const aide = avecRecette && cmd.erreurs >= 2
@@ -1051,49 +1534,119 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       </section>`;
   }
 
-  // Une recette comme dans le livre du jeu : titre, plat, portions, temps,
-  // prix, et les ingrédients dans leurs cases.
-  function emplacements(map, { min = 4 } = {}) {
-    const cases = [...map].map(([k, n]) => `<span class="e5-empl" title="${esc(D.ARTICLES[k].nom)}">${icone(k)}<b>×${n}</b></span>`);
-    while (cases.length < min) cases.push('<span class="e5-empl e5-empl-vide"></span>');
-    return `<div class="e5-emplacements">${cases.join('')}</div>`;
-  }
+  // Une recette comme dans le livre du jeu (maquette de Clément) : les trois
+  // étoiles (une de plus à chaque plat servi), le titre, le plat et sa
+  // famille, les portions, le temps, le prix et l'expérience, les
+  // ingrédients dans leurs cases (grisés s'il en manque au frigo), l'épice
+  // facultative dans sa case fleurie, et le bouton : le panier s'il manque
+  // quelque chose (direction le marché), le fouet si tout est là.
+  const servis = new Map();             // combien de fois chaque recette a été servie
+  const dureeLivre = (min) => {
+    const h = Math.floor(min / 60);
+    const m = String(min % 60).padStart(2, '0');
+    return h ? `${h}:${m}:00` : `${m}:00`;
+  };
+  const ETOILE = 'M0 -9 L2.6 -3.2 L8.8 -2.8 L4 1.2 L5.6 7.4 L0 4 L-5.6 7.4 L-4 1.2 L-8.8 -2.8 L-2.6 -3.2 Z';
+  const CATEGORIES = {
+    feuille: '<path d="M-6 6 C-8 -2 -2 -8 7 -7 C8 2 2 8 -6 6 Z M-6 6 L4 -4" fill="none" stroke="#6b5640" stroke-width="1.6" stroke-linejoin="round"/>',
+    louche: '<path d="M4 -9 L-1 3" stroke="#6b5640" stroke-width="1.8" stroke-linecap="round"/><path d="M-7 2 Q-7 8 -2 8 Q3 8 3 3 Z" fill="none" stroke="#6b5640" stroke-width="1.6"/>',
+    plat: '<path d="M-8 1 Q-8 -7 0 -7 Q8 -7 8 1 Z" fill="none" stroke="#6b5640" stroke-width="1.6"/><path d="M-9 3 H9 M-7 6 H7" stroke="#6b5640" stroke-width="1.6" stroke-linecap="round"/>',
+    dessert: '<path d="M-3 9 V-3 Q-3 -8 1.5 -8 Q6 -8 6 -3" fill="none" stroke="#6b5640" stroke-width="2" stroke-linecap="round"/><path d="M-3 6 L-1 4 M-3 1 L-1 -1 M0 -6 L1 -4 M4 -7 L3 -5" stroke="#d6334a" stroke-width="1.3" stroke-linecap="round"/>',
+    boisson: '<path d="M-6 -4 H5 V3 Q5 7 1 7 H-2 Q-6 7 -6 3 Z" fill="none" stroke="#6b5640" stroke-width="1.6"/><path d="M5 -2 Q9 -2 9 1 Q9 4 5 4" fill="none" stroke="#6b5640" stroke-width="1.4"/>',
+  };
+  const icoXp = '<i class="e5-xp-ico" aria-hidden="true">XP</i>';
 
-  function recetteHtml(cle) {
+  function carteRecette(cle, { bouton = true, manque = true } = {}) {
     const r = recette(cle);
     const T = TEXTES.livreTexte;
+    const n = servis.get(cle) || 0;
+    const etoiles = [0, 1, 2].map((i) => `<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="${ETOILE}" class="${n > i ? ['e5-bronze', 'e5-argent', 'e5-or'][i] : ''}"/></svg>`).join('');
     if (r.secret && !secrets.has(cle)) {
       return `
-      <article class="e5-recette e5-secrete">
-        <h4>${esc(T.secretTitre)}</h4>
-        <div class="e5-recette-haut">
-          <div class="e5-assiette"><svg viewBox="-24 -24 48 48" aria-hidden="true"><path d="M-17 8 Q-17 -12 0 -12 Q17 -12 17 8 Z" fill="#d8ccef" stroke="#1a1026" stroke-width="1.6"/><circle cy="-14" r="2.6" fill="#b48cff" stroke="#1a1026" stroke-width="1.4"/><rect x="-21" y="7" width="42" height="4" rx="2" fill="#b48cff" stroke="#1a1026" stroke-width="1.4"/><text y="3" text-anchor="middle" font-size="14" font-weight="700" fill="#7a3cf0">?</text></svg></div>
-          <ul class="e5-infos"><li>${esc(T.portions)}</li><li>${esc(T.inconnu)}</li><li class="e5-note">${esc(T.secret)}</li></ul>
+      <article class="e5-rcarte e5-rsecrete">
+        <div class="e5-retoiles">${etoiles}</div>
+        <h4>${fr(T.secretTitre)}</h4>
+        <div class="e5-rmilieu">
+          <div class="e5-rplat"><b class="e5-rquestion">?</b></div>
+          <ul class="e5-rinfos"><li>${fr(T.portions)}</li><li>${fr(T.inconnu)}</li><li class="e5-rnote">${fr(T.secret)}</li></ul>
         </div>
-        <div class="e5-emplacements">${'<span class="e5-empl e5-empl-vide">?</span>'.repeat(4)}</div>
+        <div class="e5-rbas"><div class="e5-ringr">${'<span class="e5-ri e5-ri-vide">?</span>'.repeat(5)}<span class="e5-ri e5-ri-vide e5-ri-epice">?</span></div>${bouton ? '<span class="e5-rbouton e5-rbouton-vide"></span>' : ''}</div>
       </article>`;
     }
+    const ings = Object.entries(r.ingredients);
+    const tout = ings.every(([k, q]) => nb(k) >= q);
+    const cases = ings.map(([k, q]) => `<span class="e5-ri${manque && nb(k) < q ? ' e5-manque' : ''}" title="${esc(D.ARTICLES[k].nom)}">${icone(k)}<b>×${q}</b></span>`);
+    while (cases.length < 5) cases.push('<span class="e5-ri e5-ri-vide"></span>');
+    const epice = r.epice
+      ? `<span class="e5-ri e5-ri-epice${manque && !nb(r.epice) ? ' e5-manque' : ''}" title="${esc(T.epice(D.ARTICLES[r.epice]))}">${icone(r.epice)}<b>×1</b></span>`
+      : '<span class="e5-ri e5-ri-vide e5-ri-epice"></span>';
     return `
-      <article class="e5-recette">
-        <h4>${esc(r.nom)}</h4>
-        <div class="e5-recette-haut">
-          <div class="e5-assiette"><svg viewBox="-24 -24 48 48" aria-hidden="true">${D.PLATS[r.plat]({ vapeur: false })}</svg></div>
-          <ul class="e5-infos"><li>${esc(T.portions)}</li><li>${esc(T.pret(r.cuisson))}</li><li class="e5-par-portion">${ICONE_PIECE}<span>${esc(T.parPortion(PAIEMENT))}</span></li></ul>
+      <article class="e5-rcarte">
+        <div class="e5-retoiles" title="${esc(T.etoiles(n))}">${etoiles}</div>
+        <h4>${fr(r.nom)}</h4>
+        <div class="e5-rmilieu">
+          <div class="e5-rplat"><svg viewBox="-22 -22 44 44" aria-hidden="true">${D.PLATS[r.plat]({ vapeur: false })}</svg><span class="e5-rcat"><svg viewBox="-11 -11 22 22" aria-hidden="true">${CATEGORIES[r.categorie] || ''}</svg></span></div>
+          <ul class="e5-rinfos">
+            <li>${fr(T.portions)}</li>
+            <li>${fr(T.pret(dureeLivre(r.cuisson)))}</li>
+            <li class="e5-rgain">${ICONE_PIECE}<span>${fr(T.parPortion(r.prix))}</span></li>
+            <li class="e5-rgain">${icoXp}<span>${r.xp}</span></li>
+          </ul>
         </div>
-        ${emplacements(new Map(Object.entries(r.ingredients)))}
+        <div class="e5-rbas">
+          <div class="e5-ringr">${cases.join('')}${epice}</div>
+          ${bouton ? `<span class="e5-rbouton ${tout ? 'e5-rfouet' : 'e5-rpanier'}" role="img" aria-label="${esc(tout ? T.toutLa : T.manque)}" title="${esc(tout ? T.toutLa : T.manque)}">${tout ? ICONE_FOUET : '<img src="images/hud/panier.webp" alt="">'}</span>` : ''}
+        </div>
       </article>`;
+  }
+
+  // Les pages du livre ouvert : deux cartes par page ; deux pages côte à côte
+  // quand il y a la place (sinon une), et une seule carte par page quand la
+  // hauteur manque (téléphone couché).
+  function miseEnPage() {
+    const l = zone.clientWidth;
+    const h = zone.clientHeight;
+    const parPage = h < 560 ? 1 : 2;
+    const pagesParVue = l >= 640 ? 2 : 1;
+    return { parPage, pagesParVue };
+  }
+
+  // Le livre en lecture : toutes les recettes, et les commandes en cours.
+  function livreConsultation() {
+    const T = TEXTES.livreTexte;
+    const enCours = commandes.filter((c) => c.etat === 'assise');
+    const f = fenetre({ titre: T.titre, couleur: '#a86f3f', genre: 'livre', classe: 'e5-livre e5-gglivre' });
+    const cles = Object.keys(RECETTES);
+    let premiere = 0;                   // la première page visible
+    function rendre() {
+      const { parPage, pagesParVue } = miseEnPage();
+      const pages = [];
+      for (let i = 0; i < cles.length; i += parPage) pages.push(cles.slice(i, i + parPage));
+      premiere = Math.max(0, Math.min(premiere - (premiere % pagesParVue), pages.length - 1));
+      const visibles = pages.slice(premiere, premiere + pagesParVue);
+      f.corps.innerHTML = `
+        <div class="e5-gl" style="--pages:${pagesParVue};--cartes:${parPage}">
+          <div class="e5-gl-pages">${visibles.map((pg, i) => `<section class="e5-gl-page${i ? ' e5-gl-droite' : ''}">${pg.map((k) => carteRecette(k)).join('')}</section>`).join('')}</div>
+          ${premiere > 0 ? `<button type="button" class="e5-gl-fleche e5-gl-avant" data-e5="livre-avant" aria-label="${esc(T.avant)}"></button>` : ''}
+          ${premiere + pagesParVue < pages.length ? `<button type="button" class="e5-gl-fleche e5-gl-apres" data-e5="livre-apres" aria-label="${esc(T.apres)}"></button>` : ''}
+          <p class="e5-gl-num">${T.page(Math.floor(premiere / pagesParVue) + 1, Math.ceil(pages.length / pagesParVue))}</p>
+          ${enCours.length ? `<section class="e5-pense-bete"><h3>${fr(T.commandes)}</h3>${enCours.map((c) => demandeHtml(c)).join('')}</section>` : ''}
+        </div>`;
+      f.pagesParVue = pagesParVue;
+      f.el.classList.toggle('e5-deux-pages', pagesParVue === 2);
+    }
+    rendre();
+    f.corps.addEventListener('click', (e) => {
+      const b = e.target.closest('.e5-gl-fleche');
+      if (!b) return;
+      bip('papier');
+      premiere += (b.classList.contains('e5-gl-apres') ? 1 : -1) * f.pagesParVue;
+      rendre();
+    });
+    return f.resultat;
   }
 
   const livreHtml = (gauche, droite) => `<div class="e5-pages"><div class="e5-page e5-page-g">${gauche}</div><div class="e5-page e5-page-d">${droite}</div></div>`;
-
-  // Le livre en lecture : commandes en cours et toutes les recettes.
-  function livreConsultation() {
-    const enCours = commandes.filter((c) => c.etat === 'assise');
-    const [a, b, c2, d] = Object.keys(RECETTES).map(recetteHtml);
-    const corps = `${livreHtml(a + b, c2 + d)}
-      ${enCours.length ? `<section class="e5-pense-bete"><h3>${esc(TEXTES.livreTexte.commandes)}</h3>${enCours.map((c) => demandeHtml(c)).join('')}</section>` : ''}`;
-    return fenetre({ titre: TEXTES.livreTexte.titre, couleur: '#a86f3f', genre: 'livre', classe: 'e5-livre', corps }).resultat;
-  }
 
   // Le livre au fourneau : choisir la commande et remplir la casserole.
   // Renvoie { action: 'cuisiner' | 'marche', cmd, extra } ou null (fermé).
@@ -1105,15 +1658,15 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       titre: TEXTES.livreTexte.titre,
       couleur: '#a86f3f',
       genre: 'cuisine',
-      classe: 'e5-livre e5-cuisine',
+      classe: 'e5-livre e5-gglivre e5-cuisine',
       pied: `
-        <button type="button" class="e5-bouton" data-e5="livre-marche">${esc(TEXTES.boutons.marche)}</button>
-        <button type="button" class="e5-bouton e5-principal" data-e5="livre-cuisiner">${esc(TEXTES.boutons.cuisiner)}</button>`,
+        <button type="button" class="e5-ggbouton e5-ggjaune" data-e5="livre-marche"><img src="images/hud/panier.webp" alt="">${esc(TEXTES.boutons.marche)}</button>
+        <button type="button" class="e5-ggbouton e5-ggvert" data-e5="livre-cuisiner">${ICONE_FOUET}${esc(TEXTES.boutons.cuisiner)}</button>`,
     });
 
     function rendre() {
       const hauts = [...f.corps.querySelectorAll('.e5-page')].map((p) => p.scrollTop);
-      const dispo = ORDRE.filter((k) => nb(k) > 0);
+      const dispo = ORDRE.filter((k) => nb(k) > 0 && !EPICES.includes(k));
       const gauche = `
         <h3 class="e5-titre-page">${esc(TEXTES.livreTexte.commande)}</h3>
         ${pretes.length > 1 ? `
@@ -1121,7 +1674,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
           ${pretes.map((c, i) => `<button type="button" role="tab" class="e5-onglet" data-i="${i}" data-e5="onglet-${c.sorte}" aria-selected="${c === cmd}">${visageSvg(c.sorte, 'e5-mini')}<span>${esc(recette(c.recette).nom)}</span></button>`).join('')}
         </div>` : ''}
         ${demandeHtml(cmd, { avecRecette: true })}
-        ${recetteHtml(cmd.recette)}`;
+        ${carteRecette(cmd.recette, { bouton: false })}`;
       const droite = `
         <section class="e5-section">
           <h3 class="e5-titre-page">${esc(TEXTES.livreTexte.frigo)}</h3>
@@ -1222,24 +1775,97 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   let achats = null;                    // ce qui est acheté pendant la sortie en cours
   const commentes = new Set();
 
-  function boutique(e) {
-    const corps = `<div class="e5-produits">${e.articles.map((k) => `
-      <div class="e5-produit" data-cle="${k}">
-        <p class="e5-produit-nom">${esc(D.ARTICLES[k].nom)}</p>
-        <div class="e5-assiette">${icone(k)}</div>
-        <p class="e5-stock" title="${esc(TEXTES.boutique.auFrigo)}"><b>${nb(k)}</b>${ICONE_FRIGO}</p>
-        <div class="e5-achat">
-          <p class="e5-prix">${ICONE_PIECE}<span>${PRIX[k]}</span></p>
-          <button type="button" class="e5-acheter" data-e5="acheter-${k}" aria-label="${esc(TEXTES.boutique.acheter)} : ${esc(D.ARTICLES[k].nom)}" title="${esc(TEXTES.boutique.acheter)}">${ICONE_PANIER}</button>
-        </div>
-      </div>`).join('')}</div>`;
+  // La boutique d'un étal, comme dans le jeu d'origine (maquette « obchod s
+  // přísadami ») : en haut la bourse, le titre et ce qu'il y a au frigo ;
+  // les onglets des étals (au marché), et à droite la vitrine ou le frigo ;
+  // dessous, les cartes des aliments : le prix, ce qu'il en reste au frigo,
+  // acheter, et revendre (au même prix, si on s'est trompée).
+  // e : l'étal ouvert, ou null pour le frigo.
+  function fenetreBoutique(e) {
+    const B = TEXTES.boutique;
+    const auMarche = vue === 'marche';
+    let etal = e;
     const total = () => [...frigo.values()].reduce((x, y) => x + y, 0);
-    const f = fenetre({ titre: e.nom, couleur: e.couleur, genre: 'boutique', classe: 'e5-boutique', corps, sousTitre: TEXTES.livreTexte.totalFrigo(total()) });
-    f.majTotal = () => { const b = f.el.querySelector('.e5-sous-titre b'); if (b) b.textContent = String(total()); };
+    const libre = (k) => nb(k) - (pot.get(k) || 0);   // ce qui n'est pas déjà dans la casserole
+    const f = fenetre({ titre: e ? e.nom : TEXTES.frigo.titre, couleur: '#a86f3f', genre: e ? 'boutique' : 'frigo', classe: 'e5-livre e5-ggboutique' });
+
+    function carte(k) {
+      const vendable = auMarche && PRIX[k] !== undefined;
+      return `
+        <div class="e5-gb-carte" data-cle="${k}">
+          <p class="e5-gb-nom">${esc(D.ARTICLES[k].nom)}</p>
+          <div class="e5-gb-plat">${icone(k)}</div>
+          <p class="e5-gb-stock" title="${esc(B.auFrigo)}"><b>${nb(k)}</b>${ICONE_FRIGO_BLEU}</p>
+          ${PRIX[k] !== undefined ? `<p class="e5-gb-prix">${ICONE_PIECE}<span>${PRIX[k]}</span></p>` : `<p class="e5-gb-prix e5-gb-cadeau">${esc(B.cadeau)}</p>`}
+          <div class="e5-gb-boutons">
+            ${etal ? `<button type="button" class="e5-gb-acheter" data-e5="acheter-${k}" aria-label="${esc(B.acheter)} : ${esc(D.ARTICLES[k].nom)}" title="${esc(B.acheter)}">${ICONE_CHARIOT}</button>` : ''}
+            ${vendable ? `<button type="button" class="e5-gb-vendre" data-e5="vendre-${k}" aria-label="${esc(B.vendre)} : ${esc(D.ARTICLES[k].nom)}" title="${esc(B.vendre)}" ${libre(k) > 0 ? '' : 'disabled'}>${ICONE_CAISSE}</button>` : ''}
+          </div>
+        </div>`;
+    }
+
+    function rendre() {
+      const articles = etal ? etal.articles : ORDRE.filter((k) => nb(k) > 0);
+      const onglets = auMarche ? `
+          <div class="e5-gb-etals" role="tablist" aria-label="${esc(B.etals)}">${ETALS.map((x) => `
+            <button type="button" role="tab" class="e5-gb-etal" data-etal="${x.cle}" aria-selected="${x === etal}" aria-label="${esc(x.nom)}" title="${esc(x.nom)}">${x.articles.slice(0, 3).map((k, i) => `<span style="--i:${i}">${icone(k)}</span>`).join('')}</button>`).join('')}
+          </div>` : '<div class="e5-gb-etals"></div>';
+      f.corps.innerHTML = `
+        <div class="e5-gb">
+          <header class="e5-gb-tete">
+            <p class="e5-gb-bourse" aria-label="${esc(B.bourse)}">${ICONE_PIECE}<b>${pieces}</b></p>
+            <span class="e5-gb-icone">${ICONE_BOUTIQUE}</span>
+            <div class="e5-gb-titres">
+              <h3>${fr(etal ? etal.nom : TEXTES.frigo.titre)}</h3>
+              <p>${esc(B.auFrigo)} <b>${total()}</b></p>
+            </div>
+          </header>
+          <nav class="e5-gb-onglets">
+            ${onglets}
+            <div class="e5-gb-vues">
+              ${auMarche ? `<button type="button" class="e5-gb-vue" data-vue="vitrine" aria-pressed="${!!etal}" aria-label="${esc(B.vitrine)}" title="${esc(B.vitrine)}"><img src="images/hud/panier.webp" alt=""></button>` : ''}
+              <button type="button" class="e5-gb-vue" data-vue="frigo" aria-pressed="${!etal}" aria-label="${esc(TEXTES.frigo.titre)}" title="${esc(TEXTES.frigo.titre)}">${ICONE_FRIGO_BLEU}</button>
+            </div>
+          </nav>
+          <div class="e5-gb-etagere">
+            ${articles.length ? `<div class="e5-gb-grille">${articles.map(carte).join('')}</div>` : `<p class="e5-gb-vide">${fr(TEXTES.frigo.vide)}</p>`}
+          </div>
+        </div>`;
+    }
+    rendre();
+    f.majTotal = () => {
+      const b = f.corps.querySelector('.e5-gb-titres b');
+      if (b) b.textContent = String(total());
+      const p = f.corps.querySelector('.e5-gb-bourse b');
+      if (p) p.textContent = String(pieces);
+    };
     f.corps.addEventListener('click', (ev) => {
-      const b = ev.target.closest('.e5-acheter');
-      if (b) acheter(b.closest('.e5-produit'));
+      const ong = ev.target.closest('.e5-gb-etal');
+      const vueB = ev.target.closest('.e5-gb-vue');
+      const achat = ev.target.closest('.e5-gb-acheter');
+      const vente = ev.target.closest('.e5-gb-vendre');
+      if (ong) {
+        const x = ETALS.find((y) => y.cle === ong.dataset.etal);
+        if (x !== etal) { bip('clic', 0.5); etal = x; rendre(); }
+      } else if (vueB) {
+        const veut = vueB.dataset.vue === 'frigo' ? null : (etal || e || ETALS[0]);
+        if (veut !== etal) { bip('clic', 0.5); etal = veut; rendre(); }
+      } else if (achat) {
+        acheter(achat.closest('.e5-gb-carte'));
+      } else if (vente && !vente.disabled) {
+        revendre(vente.closest('.e5-gb-carte'), libre);
+      }
     });
+    return f;
+  }
+  const boutique = (e) => fenetreBoutique(e);
+
+  function majCarte(carte) {
+    const k = carte.dataset.cle;
+    carte.querySelector('.e5-gb-stock b').textContent = String(nb(k));
+    const v = carte.querySelector('.e5-gb-vendre');
+    if (v) v.disabled = nb(k) - (pot.get(k) || 0) <= 0;
+    fenetreCourante?.majTotal?.();
   }
 
   function acheter(carte) {
@@ -1256,10 +1882,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     frigo.set(k, nb(k) + 1);
     majBadge();
     if (achats) achats.push(k);
-    carte.querySelector('.e5-stock b').textContent = String(nb(k));
-    fenetreCourante?.majTotal?.();
+    majCarte(carte);
     bip('piece');
-    const icon = carte.querySelector('svg');
+    const icon = carte.querySelector('.e5-gb-plat svg');
     rebondir(icon);
     envolee(D.ARTICLES[k].dessin(), centre(icon), centre(panier), { duree: 620, taille: 34 })
       .then(() => rebondir(panier));
@@ -1267,6 +1892,22 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       commentes.add(k);
       direUnInstant(TEXTES.achatDeteste(D.ARTICLES[k]), 3400);
     }
+  }
+
+  // Revendre un aliment au prix d'achat (une erreur de courses, ou un prix
+  // de la roue dont on n'a pas besoin).
+  function revendre(carte, libre) {
+    const k = carte.dataset.cle;
+    if (libre(k) <= 0 || PRIX[k] === undefined) return;
+    frigo.set(k, nb(k) - 1);
+    if (!nb(k)) frigo.delete(k);
+    majBadge();
+    if (achats) { const i = achats.lastIndexOf(k); if (i >= 0) achats.splice(i, 1); }
+    bip('clic', 0.5);
+    const icon = carte.querySelector('.e5-gb-plat svg');
+    envolee(D.pieceSeule(), centre(icon), centre(bourseIcone), { taille: 26, boite: '-12 -12 24 24', duree: 560 })
+      .then(() => { ajouterPieces(PRIX[k]); bip('piece'); fenetreCourante?.majTotal?.(); });
+    majCarte(carte);
   }
 
   // Plus assez de pièces pour finir une seule des commandes restantes, et
@@ -1316,6 +1957,14 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       boutique(e);
     });
   }
+  // Le stand aux ballons PLAY : la roue de la fortune.
+  const kiosque = $('[data-e5="roue"]');
+  surToucher(kiosque, () => {
+    if (vue !== 'marche' || enTransition || fenetreCourante) return;
+    bip('clic', 0.6);
+    rebondir(kiosque);
+    fenetreRoue();
+  });
   let rentrer = null;                   // le panneau « Café » ramène au café
   surToucher($('[data-e5="vers-cafe"]'), () => {
     if (vue === 'marche' && rentrer) { bip('clic', 0.4); rentrer(); }
@@ -1325,17 +1974,20 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   // pour les clients pas encore installés).
   function manquePourLaSuite() {
     const total = new Map();
-    for (const c of commandes) {
-      if (c.etat !== 'dehors' && c.etat !== 'assise') continue;
+    const prochaines = commandes.filter((c) => c.etat === 'dehors' || c.etat === 'assise').slice(0, L.tables.length);
+    for (const c of prochaines) {
       const b = c.etat === 'assise' ? besoins(c) : new Map(Object.entries(RECETTES[c.recette].ingredients));
       for (const [k, n] of b) total.set(k, (total.get(k) || 0) + n);
     }
     return [...total].filter(([k, n]) => nb(k) < n).map(([k]) => k);
   }
 
+  let visitesMarche = 0;
   async function allerAuMarche() {
     achats = [];
     await changerVue('marche');
+    visitesMarche += 1;
+    if (visitesMarche === 2) dormir(2200).then(() => { if (vivant && vue === 'marche') direUnInstant(TEXTES.astuceRoue); });
     const sortie = achats;
     dormir(22000).then(() => { if (vivant && vue === 'marche' && achats === sortie && !sortie.length) direUnInstant(TEXTES.astuceMarche, 4500); });
     for (;;) {
@@ -1396,6 +2048,15 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
   surToucher($('[data-e5="frigo"]'), () => {
     if (vue === 'cafe' && !fenetreCourante && !enTransition && outilsPrets) { bip('clic', 0.5); fenetreFrigo(); }
+  });
+
+  // Le camion du chef pâtissier, garé à droite du café : « Trouve la garniture ».
+  const camion = $('[data-e5="camion"]');
+  surToucher(camion, () => {
+    if (vue !== 'cafe' || fenetreCourante || enTransition || !outilsPrets || enFete) return;
+    bip('clic', 0.6);
+    rebondir(camion);
+    fenetreGarniture();
   });
 
   /* -------------------------------------------------------- Les fourneaux */
@@ -1622,7 +2283,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
   async function geste(f, type) {
     const c = f.lieu.casserole;
-    if (type === 'remuer' || type === 'melanger') {
+    if (['remuer', 'melanger', 'battre', 'fondre'].includes(type)) {
       const g = svgEl('g', {}, calques.volants);
       g.innerHTML = `<g class="e5-touille">${D.cuillere()}</g>`;
       placer(g, c.x + 2, c.y - 2);
@@ -1633,10 +2294,12 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       f.el.classList.add('e5-four-chaud');
       bip('feu');
       await dormir(500);
-    } else if (type === 'retourner') {
+    } else if (type === 'retourner' || type === 'plier') {
       const g = svgEl('g', {}, calques.volants);
       const crepe = svgEl('g', { class: 'e5-crepe-volante' }, g);
-      crepe.innerHTML = '<ellipse rx="13" ry="4.5" fill="#f6cf8c" stroke="#dea457" stroke-width="1.2"/><ellipse cx="-3" cy="-1" rx="2" ry="1" fill="#dea457"/>';
+      crepe.innerHTML = type === 'plier'
+        ? '<ellipse rx="12" ry="4.2" fill="#f2c94c" stroke="#d9a72a" stroke-width="1.2"/><ellipse cx="-3" cy="-1" rx="2" ry="1" fill="#fbe08a"/>'
+        : '<ellipse rx="13" ry="4.5" fill="#f6cf8c" stroke="#dea457" stroke-width="1.2"/><ellipse cx="-3" cy="-1" rx="2" ry="1" fill="#dea457"/>';
       placer(g, c.x, c.y - 4);
       bip('vol');
       await animer(crepe, [
@@ -1646,6 +2309,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       ], { duree: 800, easing: 'ease-in-out', garder: false });
       g.remove();
       bip('plouf');
+    } else if (type === 'couper') {
+      bip('croque');
+      await secouerCasserole(f);
     } else {
       bip('plouf');
       await secouerCasserole(f);
@@ -1677,7 +2343,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   // ingrédients, puis chaque geste : on touche, la barre se remplit. Puis la
   // cuisson démarre et on est libre de lancer autre chose.
   let premiereCuisson = true;
-  async function preparer(f, { cmd, extra }) {
+  async function preparer(f, { cmd, extra, epice = null }) {
     const r = recette(cmd.recette);
     const T = TEXTES.fourneau;
     const nom = TEXTES.feux.nom(f.k + 1);
@@ -1685,6 +2351,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     Object.assign(f, { etat: 'gestes', cmd, r, extra, fait: 0, total: r.cuisson * 60, vitesse: 1 });
     const contenu = [...pot].flatMap(([k, n]) => Array(n).fill(k));
     for (const [k, n] of pot) frigo.set(k, nb(k) - n);
+    cmd.epice = epice;
+    if (epice) { contenu.push(epice); frigo.set(epice, nb(epice) - 1); }
     for (const k of [...frigo.keys()]) if (!nb(k)) frigo.delete(k);
     pot.clear();
     majBadge();
@@ -1723,6 +2391,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     }
   }
 
+  let camionDit = false;
   // On touche un fourneau où le plat est prêt : il part au comptoir (ou, pour
   // la spécialité, la fête commence).
   async function sortirPlat(f, enFond) {
@@ -1739,9 +2408,10 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     await platVersComptoir(r, cmd, f);
     cmd.etat = 'comptoir';
     enFond.push(servir(cmd).then(async () => {
-      await mangerEtPartir(cmd.client, extra);
+      await mangerEtPartir(cmd.client, extra, cmd.epice, RECETTES[cmd.recette].prix);
       cmd.etat = 'partie';
       signaler();
+      if (!camionDit) { camionDit = true; direUnInstant(TEXTES.astuceCamion); }
     }));
   }
 
@@ -1758,7 +2428,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     const siege = L.sieges[table];
     return {
       g, corps, x: siege.x, y: siege.y, table: L.tables[table], chemin: L.chemins[table],
-      haut: perso.haut * k, tete: perso.tete * k, nom: perso.nom, bulle: null, assiette: null,
+      haut: perso.haut * k, tete: perso.tete * k, nom: nomDe(sorte), bulle: null, assiette: null,
     };
   }
 
@@ -1830,8 +2500,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       c.assiette = a;
       if (c.bulle) { c.bulle.remove(); c.bulle = null; }
       cmd.etat = 'servie';
+      servis.set(cmd.recette, (servis.get(cmd.recette) || 0) + 1);
       bip('plouf');
-      gagnerXp(N.parClient);
+      gagnerXp(RECETTES[cmd.recette].xp + (cmd.epice ? TEXTES.epice.xp : 0));
       poser();
       await voler(pipi, L.pipi.x, L.pipi.y, 850, { hauteur: 26 });
       pipi.classList.remove('e5-vole');
@@ -1875,7 +2546,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   }
 
   let rangBeurk = 0;
-  async function mangerEtPartir(c, extra) {
+  async function mangerEtPartir(c, extra, epice, prix) {
     await dormir(350);
     if (extra) {
       const rang = rangBeurk++;
@@ -1890,10 +2561,11 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       coeurs(p.x, p.y, 4);
       bip('miam');
       c.corps.classList.add('e5-content');
+      if (epice) direUnInstant(TEXTES.epice.miam(c.nom, D.ARTICLES[epice]));
       await animer(c.assiette.firstElementChild, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duree: 2200, easing: 'ease-in' });
       c.assiette.remove();
       c.corps.classList.remove('e5-content');
-      poserPieces(c.table.x + 14, c.table.y - L.dessus - 4, PAIEMENT);
+      poserPieces(c.table.x + 14, c.table.y - L.dessus - 4, prix + (epice ? TEXTES.epice.pieces : 0));
     }
     await dormir(400);
     await marcher(c, [...c.chemin].reverse().map((p) => [p.x, p.y]));
@@ -1902,10 +2574,17 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     c.g.remove();
   }
 
+  // Le client attend que sa table se libère (le client d'avant est parti).
+  async function tableLibre(cmd, cmds) {
+    const occupee = () => cmds.some((c) => c !== cmd && c.table === cmd.table && ['assise', 'cuisine', 'comptoir', 'servie'].includes(c.etat));
+    while (vivant && occupee()) await unChangement();
+  }
+
   function lancerArrivees(cmds) {
     return (async () => {
       for (let i = 0; i < cmds.length; i++) {
         await dormir(ARRIVEES[i] ?? 3000);
+        await tableLibre(cmds[i], cmds);
         await enCafe();
         await entrer(cmds[i]);
         cmds[i].etat = 'assise';
@@ -1933,6 +2612,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
         await allerAuMarche();
         continue;
       }
+      // L'épice de la recette est au frigo : on propose de relever le plat.
+      const ep = recette(res.cmd.recette).epice;
+      res.epice = ep && nb(ep) > 0 && await proposerEpice(ep) ? ep : null;
       await preparer(f, res);
       return true;
     }
@@ -1973,10 +2655,14 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       if (!f) continue;
       cacherGuide();
       if (f.etat === 'pret') {
-        await sortirPlat(f, enFond);
+        // Le plat part au comptoir pendant qu'on peut déjà toucher un autre
+        // fourneau (sauf la spécialité : la fête commence).
+        if (f.cmd.special) await sortirPlat(f, enFond);
+        else enFond.push(sortirPlat(f, enFond));
       } else if (f.etat === 'cuisson') {
         bip('clic', 0.3);
-        direUnInstant(f.vitesse > 1 ? f.r.cuit : `${f.r.cuit} ${TEXTES.astuce60x}`, 3200);
+        if (expressRestant > 0) await proposerExpress(f);
+        else direUnInstant(f.vitesse > 1 ? f.r.cuit : `${f.r.cuit} ${TEXTES.astuce60x}`, 3200);
       } else if (f.etat === 'libre') {
         if (!enAttente.length) {
           bip('non');
@@ -1988,29 +2674,23 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       }
     }
     cacherGuide();
-    await Promise.all(enFond);
+    while (enFond.length) await enFond.shift();   // (de nouvelles promesses s'ajoutent en route)
   }
 
   /* ------------------------------------------------------ Le client spécial */
 
+  // Le dernier client : Clément, qui entre comme les autres et s'installe.
   async function entreeSpeciale() {
-    const g = svgEl('g', { class: 'e5-client' }, calques.clients);
-    g.style.opacity = '0';
-    const corps = svgEl('g', { class: 'e5-flotte' }, g);
-    corps.innerHTML = `<g transform="scale(${L.echelle})">${D.machaon()}</g>`;
-    const ailes = corps.querySelector('.e5-ailes-machaon');
-    placer(g, L.porte.x, L.porte.y - 30);
-    ouvrirPorte();
-    bip('sonnette');
-    ailes.classList.add('e5-vite');
-    animer(g, [{ opacity: 0 }, { opacity: 1 }], { duree: 400 });
-    await voler(g, L.perchoir.x, L.perchoir.y, 2800, { hauteur: 50, ondule: 12 });
-    ailes.classList.remove('e5-vite');
-    const k = L.echelle;
-    const c = { g, corps, ailes, x: L.perchoir.x, y: L.perchoir.y, haut: D.MACHAON.haut * k, tete: D.MACHAON.tete * k, nom: D.MACHAON.nom, bulle: null, assiette: null };
-    c.bulle = bulleDeCommande(c.x, c.y - 40, 'gateau');
-    bip('clic', 0.8);
-    return c;
+    const cmd = { sorte: 'clement', table: 1, recette: 'gateau', special: true, etat: 'dehors', erreurs: 0 };
+    cmd.client = creerClient(cmd);
+    // le machaon de l'étape 4 l'accompagne, posé sur son épaule
+    const papillon = svgEl('g', { transform: `translate(${(9 * L.echelle).toFixed(1)} ${(-50 * L.echelle).toFixed(1)}) scale(.3)` }, cmd.client.g);
+    papillon.innerHTML = `<g class="e5-flotte">${D.machaon()}</g>`;
+    await entrer(cmd);
+    cmd.etat = 'assise';
+    const p = versEcran(cmd.client.x, cmd.client.y + cmd.client.tete);
+    coeurs(p.x, p.y, 6);
+    return cmd;
   }
 
   function objetSurTable(dessin, x, y, nom, etiquette, parent = calques.tables) {
@@ -2022,9 +2702,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
   /* ------------------------------------------------ La fête d'anniversaire */
 
-  // Le gâteau du machaon était pour elle : lumières tamisées, bougies, la
-  // chanson, les clients qui reviennent ; elle souffle, puis le machaon
-  // dépose le mot et le cadeau.
+  // Le gâteau de Clément était pour elle : lumières tamisées, bougies, la
+  // chanson, les clients qui reviennent ; elle souffle, puis Clément dépose
+  // son mot et le cadeau.
   async function fete(cmd, f) {
     const T = TEXTES.fete;
     const sp = cmd.client;
@@ -2058,9 +2738,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       aller(support, C.x, C.y, 1200, 'cubic-bezier(.3,.8,.3,1)'),
       animer(gateau, [{ transform: 'scale(.18)' }, { transform: 'scale(1)' }], { duree: 1200, easing: 'cubic-bezier(.3,.8,.3,1)' }),
     ]);
-    sp.ailes.classList.add('e5-vite');
-    await voler(sp.g, 338, 226, 1300, { hauteur: 30, ondule: 8 });
-    sp.ailes.classList.remove('e5-vite');
+    const S = { x: C.x + 82, y: C.y + 4 };   // la place de Clément, à côté du gâteau
+    await marcher(sp, [[S.x, sp.y], [S.x, S.y]]);
     await dire(T.surprise, [T.pourMoi]);
 
     // Les bougies, puis Pipistrelle les allume.
@@ -2086,9 +2765,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     animer(lueur, [{ opacity: 0 }, { opacity: 1 }], { duree: 900 });
 
     // Les clients du soir reviennent pour la fête.
-    for (const [sorte, x, y] of [['herisson', 52, 398], ['grenouille', 96, 408], ['loutre', 346, 400]]) {
+    for (const [sorte, x, y] of [['bichette', 34, 392], ['chachoux', 68, 404], ['estel', 102, 414], ['gaston', 314, 416], ['angeloune', 344, 404], ['rachou', 374, 392]]) {
       const g = svgEl('g', {}, invites);
-      g.innerHTML = `<g class="e5-invite">${D.PERSONNAGES[sorte].dessin()}</g>`;
+      g.innerHTML = `<g class="e5-invite"><g transform="scale(.9)">${D.PERSONNAGES[sorte].dessin()}</g></g>`;
       placer(g, x, y);
       bip('poc');
       animer(g.firstElementChild, [{ opacity: 0, transform: 'translateY(18px) scale(.7)' }, { opacity: 1, transform: 'none' }], { duree: 420, easing: 'cubic-bezier(.3,1.5,.5,1)' });
@@ -2135,20 +2814,18 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     monterNiveau();
     await dormir(1500);
 
-    // Le machaon dépose l'enveloppe et le cadeau sur le présentoir.
+    // Clément dépose son mot et le cadeau, de part et d'autre du gâteau.
     const E = { x: C.x - 66, y: C.y + 12 };
     const K = { x: C.x + 68, y: C.y + 8 };
-    sp.ailes.classList.add('e5-vite');
-    await voler(sp.g, E.x, E.y - 34, 1100, { hauteur: 24, ondule: 6 });
+    await marcher(sp, [[S.x, S.y + 22], [E.x + 14, S.y + 22], [E.x + 14, E.y + 10]]);
     const enveloppe = objetSurTable(D.enveloppe(), E.x, E.y, 'enveloppe', TEXTES.ariaEnveloppe, calque);
     bip('papier');
-    await voler(sp.g, K.x, K.y - 38, 800, { hauteur: 18, ondule: 6 });
+    await marcher(sp, [[E.x + 14, S.y + 22], [K.x + 18, S.y + 22], [K.x + 18, K.y + 10]]);
     const cadeau = objetSurTable(D.cadeau(), K.x, K.y, 'cadeau', TEXTES.ariaCadeau, calque);
     bip('chiffre');
     const q = versEcran(K.x, K.y - 8);
     if (vivant) fx.etincelles(q.x, q.y, 16, '#d7b3ff', 140);
-    await voler(sp.g, 338, 226, 1100, { hauteur: 30, ondule: 8 });
-    sp.ailes.classList.remove('e5-vite');
+    await marcher(sp, [[S.x, S.y]]);
     calque.append(sp.g, pipi);
     ambiance('salle');
     return { enveloppe, cadeau, x: E.x, y: E.y };
@@ -2408,7 +3085,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
     await dire(TEXTES.intro, [TEXTES.boutons.intro]);
     outilsPrets = true;
-    await dire(TEXTES.livre, [TEXTES.boutons.voirLivre]);
+    const premiers = CLIENTS.slice(0, L.tables.length).map((c) => TEXTES.recettes[c.recette].dans);
+    await dire(TEXTES.livre(`${premiers.slice(0, -1).join(', ')} et ${premiers[premiers.length - 1]}`), [TEXTES.boutons.voirLivre]);
     await livreConsultation();
     await dire(TEXTES.versMarche, [TEXTES.boutons.marche]);
 
@@ -2426,11 +3104,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     await dormir(1800);
 
     // Le client très spécial.
-    const special = await entreeSpeciale();
     secrets.add('gateau');
-    const cmdSpeciale = { sorte: 'machaon', recette: 'gateau', special: true, etat: 'assise', erreurs: 0, client: special };
+    const cmdSpeciale = await entreeSpeciale();
     commandes = [cmdSpeciale];
-    rendreBavard(cmdSpeciale, special.g, special.bulle);
     bip('eclat');
     await service(commandes, { premierTexte: TEXTES.special, texte: TEXTES.commandeSpeciale });
     const { enveloppe, cadeau, x, y } = cmdSpeciale.objets;
@@ -2528,6 +3204,16 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       get son() { return son.ambianceCourante ? son.ambianceCourante() : null; },
       get feux() { return feux.map((f) => ({ etat: f.etat, recette: f.cmd && f.cmd.recette, reste: Math.ceil(f.total - f.fait) })); },
       besoins: (sorte) => Object.fromEntries(besoins(commandes.find((c) => c.sorte === sorte))),
+      // pour les essais : ouvrir directement les fenêtres d'après les maquettes
+      fenetres: {
+        roue: () => fenetreRoue(),
+        garniture: () => fenetreGarniture(),
+        epice: (k = 'vanille') => proposerEpice(k),
+        express: () => proposerExpress(feux[0]),
+        hourra: (k = 'chocolat', n = 1) => hourra(k, n, TEXTES.hourra.frigo),
+      },
+      ajouter: (k, n = 1) => { frigo.set(k, nb(k) + n); majBadge(); },
+      pieces0: () => ajouterPieces(-pieces),
     };
   }
 
