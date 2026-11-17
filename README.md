@@ -184,8 +184,8 @@ En tête de `js/etapes/cafe.js` :
   d'expérience, qui monte à chaque client servi (de l'`xp` de sa recette) ; `TEXTES.chat` : le Café chat ;
   `TEXTES.hud` : les menus, dont ce que répond Pipistrelle quand on touche un
   bouton du décor (carte, réglages, porte, cadeau, toques…).
-- `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
-  marché) et leur volume.
+- `SONS` : les sons de fond (la musique du jeu d'origine dans la salle, les
+  oiseaux et la fontaine du marché) et leur volume.
 
 L'écran de connexion est l'image `images/connexion-cafe.webp`, affichée en
 entier (floutée autour si l'écran n'a pas la même forme). Les vrais champs et
