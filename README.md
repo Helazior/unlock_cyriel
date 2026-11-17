@@ -81,6 +81,13 @@ gobé (3 au plus) et en perd 1 par pierre reçue ; à zéro, elle repart du déb
 du passage. Colonnes, rythmes et cœurs : `CHUTES`, `COEURS` et `REPRISE` en
 tête de `js/etapes/etape2.js`.
 
+Le casse-tête de la fin : trois boules d'argile bouchent la galerie de la
+sortie. En touchant une boule, la chauve-souris s'en retrouve enrobée (elle ne
+peut pas la lâcher) et devient trop large pour passer par le trou qu'elle vient
+d'ouvrir. La solution : se faire toucher par une pierre du passage précédent,
+ce qui fait éclater l'argile sans coûter de cœur. Aucune indication n'est
+donnée. Taille et place du bouchon : `ARGILE`, en tête de `js/etapes/etape2.js`.
+
 ## Mise en ligne
 
 Tous les chemins sont relatifs : le dossier peut être servi tel quel depuis
