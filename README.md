@@ -278,9 +278,8 @@ les bulles se rangent en escalier, reliées à leur fourneau par un trait.
 Le nom du bandeau et les titres des fenêtres sont écrits en Patua One
 (`polices/`, licence OFL).
 
-## À compléter avant le 23
+## À compléter avant le 24
 
-- **Le mot et le cadeau** : `TEXTES.lettre` et `TEXTES.cadeau`, en tête de
-  `js/etapes/cafe.js`.
+- **Le mot** : `TEXTES.lettre`, en tête de `js/etapes/cafe.js` (écrit).
 - **Le code** : `js/code.js` (un chiffre par étape, de la grotte au machaon).
 - **Les musiques** : voir `sons/LISEZMOI.md`.
