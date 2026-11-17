@@ -226,7 +226,8 @@ sur le toit). À droite, le stand de la roue de la fortune, avec sa guirlande
 et ses ballons PLAY. Les joueurs sont les mêmes qu'avant, et ils vivent : la
 plupart se promènent (leur parcours est dans `marche()`,
 `js/etapes/cafe-dessins.js`), Rachou sautille, Estel se balance sur le banc,
-Clément fait coucou. Ce sont aussi eux, les clients du café. Le cadre du
+Clément fait coucou. Ce sont aussi eux, les clients du café, avec Gaston et
+Bichette, qui ne viennent que pour manger. Le cadre du
 marché (`CADRE_MARCHE`) garde toujours les étals, la roue et le panneau du café
 à l'écran.
 
