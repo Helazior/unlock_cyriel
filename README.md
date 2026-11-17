@@ -168,6 +168,11 @@ En tête de `js/etapes/cafe.js` :
   connexion).
 - `TEXTES.fete` : la fin, où le gâteau du machaon est pour elle ; `age` donne
   les bougies en chiffres.
+- `TEXTES.joueuse` : le nom dans le bandeau du haut ; `TEXTES.niveau` : le
+  niveau dans la tasse (23, puis 24 quand elle souffle ses bougies) et la barre
+  d'expérience, qui monte à chaque client servi ; `TEXTES.chat` : le Café chat ;
+  `TEXTES.hud` : les menus, dont ce que répond Pipistrelle quand on touche un
+  bouton du décor (carte, réglages, porte, cadeau, toques…).
 - `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
   marché) et leur volume.
 
@@ -182,10 +187,27 @@ deux arrêts juste avant « GoodCyriel » et « Café » ; le pseudo se remplit 
 seul. Les fois suivantes, c'est trois fois plus rapide. « Mot de passe
 oublié ? » donne l'indice ; « Jouer maintenant ! » ramène au mot de passe.
 
-Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre. Chacun
-a sa carte en bas de l'écran (ce qui cuit, le minuteur, son bouton 60x).
-Toucher un fourneau libre ouvre le livre ; toucher un fourneau prêt pose le
-plat sur le comptoir.
+L'écran du restaurant reprend la maquette de Clément (912 × 1724) : les menus
+sont découpés dedans (`images/hud/`) et posés aux mêmes places, à l'échelle de
+l'écran ; la salle se cadre dans l'espace libre entre eux. Les positions des
+boutons et des textes sont en pixels de la maquette (`HUD` et `ZONES`, dans
+`js/etapes/cafe.js`). En haut : le niveau, l'expérience, les pièces, le nom,
+et les icônes (la note coupe le son, « ? » fait répéter Pipistrelle, le cadre
+passe en plein écran). En bas à gauche, le Café chat : Pipistrelle y parle, ses
+questions s'y affichent en boutons, et Cyriel peut y écrire. En bas à droite :
+le livre de recettes, le fouet (touche le bon fourneau à sa place) et le panier
+(le frigo). Sur un écran plus large que la maquette, les plateaux d'actions se
+prolongent jusqu'au bord.
+
+Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre.
+Toucher un fourneau libre ouvre le livre. Au-dessus du fourneau, une bulle
+parchemin demande les ingrédients, puis chaque étape (une icône) : on touche,
+et une barre à segments se remplit avec le nom de l'étape. Puis la barre sert
+de minuteur, avec le bouton 60x. Le plat prêt s'affiche dans la bulle : on
+touche pour le poser sur le comptoir. Quand plusieurs fourneaux travaillent,
+les bulles se rangent en escalier, reliées à leur fourneau par un trait.
+
+Le nom du bandeau est écrit en Patua One (`polices/`, licence OFL).
 
 ## À compléter avant le 23
 

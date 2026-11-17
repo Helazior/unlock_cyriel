@@ -7,7 +7,7 @@
 // largement pour remplir les écrans plus larges ou plus hauts.
 
 import { cheminChiffre } from '../chiffres.js';
-import { duoSpeleo, cyrielChapeau, cyrielClin, cyrielNatte, cyrielCheffe } from './clins-doeil.js';
+import { duoSpeleo, cyrielChapeau, cyrielClin, cyrielNatte } from './clins-doeil.js';
 
 export const LARGEUR = 400;
 export const HAUTEUR = 560;
@@ -314,6 +314,59 @@ export function cuillere() {
   <ellipse cx="0" cy="2" rx="4" ry="6" transform="rotate(18)" fill="#a86f3f"/>`;
 }
 
+/* ============================================ Étapes au fourneau (icônes) */
+
+// Ce que demande la bulle au-dessus du fourneau, une étape après l'autre
+// (viewBox -24 -24 48 48, comme les ingrédients).
+
+const bol = (contenu) => `
+  <path d="M-18 -2 H18 Q17 15 0 15 Q-17 15 -18 -2 Z" fill="#f4f1fb" stroke="${ENCRE}" stroke-width="2"/>
+  <ellipse cx="0" cy="-2" rx="18" ry="4.4" fill="${contenu}" stroke="${ENCRE}" stroke-width="2"/>
+  <path d="M-12 3 Q-10 10 -4 12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>`;
+const tourne = (d, pointe) => `
+  <path d="${d}" stroke="#7a3cf0" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="${pointe}" stroke="#7a3cf0" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const poele = `
+  <ellipse cx="-1" cy="13" rx="15" ry="5" fill="#3b3b45" stroke="${ENCRE}" stroke-width="2"/>
+  <ellipse cx="-1" cy="12" rx="10.5" ry="3" fill="#56565f"/>
+  <path d="M13 14 L22 19" stroke="${ENCRE}" stroke-width="3.6" stroke-linecap="round"/>`;
+
+export const ICONES_GESTES = {
+  remuer: () => `${bol('#7b4a2d')}
+    <path d="M2 -4 L12 -21" stroke="#a86f3f" stroke-width="3.6" stroke-linecap="round"/>
+    <ellipse cx="1" cy="-3" rx="4.6" ry="2.6" fill="#a86f3f"/>
+    ${tourne('M-16 -12 A15 7 0 0 1 -4 -16', 'M-7 -19 L-3.6 -16 L-7.4 -13.4')}`,
+  melanger: () => `${bol('#f2cf93')}
+    <g transform="rotate(18 3 -4)">
+      <path d="M3 -6 V-24" stroke="#a86f3f" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M3 -6 C-7 -4 -5 9 3 9 C11 9 13 -4 3 -6 Z M3 -6 C-2 -4 -1 8 3 9 C7 8 8 -4 3 -6 Z" fill="none" stroke="#8d97a3" stroke-width="1.8"/>
+    </g>
+    ${tourne('M-17 -11 A15 7 0 0 1 -6 -16', 'M-9 -19 L-5.6 -16 L-9.4 -13.4')}`,
+  etaler: () => `
+    <ellipse cx="0" cy="9" rx="20" ry="7.5" fill="#f3d9a4" stroke="${ENCRE}" stroke-width="2"/>
+    <ellipse cx="-5" cy="8" rx="6" ry="2" fill="#fbe9c4"/>
+    <g transform="rotate(-16 0 -3)">
+      <rect x="-12" y="-8" width="24" height="10" rx="5" fill="#d9a066" stroke="${ENCRE}" stroke-width="2"/>
+      <path d="M-12 -3 H-20 M12 -3 H20" stroke="${ENCRE}" stroke-width="3.8" stroke-linecap="round"/>
+      <path d="M-7 -5.4 H5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+    </g>`,
+  enfourner: () => `
+    <rect x="-18" y="-18" width="36" height="35" rx="5" fill="#e7e9ee" stroke="${ENCRE}" stroke-width="2"/>
+    <rect x="-13" y="-6" width="26" height="17" rx="3" fill="#ff9a3c" stroke="${ENCRE}" stroke-width="1.8"/>
+    <path d="M-8 10 Q-6 1 -3 6 Q0 -3 3 6 Q6 1 8 10 Z" fill="#ffd36b"/>
+    <rect x="-12" y="-14" width="24" height="3.4" rx="1.7" fill="#9aa3ad"/>
+    <circle cx="-11" cy="-21.5" r="0"/>`,
+  verser: () => `${poele}
+    <ellipse cx="-1" cy="11.6" rx="7" ry="2.2" fill="#f6cf8c"/>
+    <path d="M-6 -1 Q-3 5 -1 10" stroke="#f6cf8c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <path d="M-16 -11 Q-14 -1 -6 -2 Q2 -3 0 -11 Z" fill="#cfcadd" stroke="${ENCRE}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M0 -11 L14 -23" stroke="#9e98b3" stroke-width="3.6" stroke-linecap="round"/>`,
+  retourner: () => `${poele}
+    <ellipse cx="0" cy="-9" rx="12" ry="4.4" transform="rotate(-16 0 -9)" fill="#f6cf8c" stroke="#dea457" stroke-width="1.8"/>
+    <ellipse cx="-3" cy="-9.6" rx="2" ry="1" fill="#dea457"/>
+    ${tourne('M-17 6 A17 17 0 0 1 -13 -15', 'M-16.6 -11.4 L-13 -15.4 L-9 -13.6')}`,
+};
+
 /* =========================================================== Personnages */
 
 // Couronne de piquants : alternance de pointes (rayon extérieur) et de creux.
@@ -442,14 +495,6 @@ export function visage(sorte) {
 
 /* ================================================================ Icônes */
 
-export function iconeLivre() {
-  return `
-  <rect x="-9" y="-10.5" width="18" height="21" rx="2.5" fill="#8f5cf7" stroke="${ENCRE}" stroke-width="1.6"/>
-  <path d="M-9 6.5 H9" stroke="#fffaf2" stroke-width="2.4"/>
-  <path d="M-5.6 -10.5 V5.5" stroke="#6a3fd0" stroke-width="1.4"/>
-  <path d="M1.5 -0.6 C-1.6 -3 -2.2 -5 -0.6 -5.6 C0.4 -6 1.1 -5.4 1.5 -4.9 C1.9 -5.4 2.6 -6 3.6 -5.6 C5.2 -5 4.6 -3 1.5 -0.6 Z" fill="#fffaf2"/>`;
-}
-
 export function iconeFrigo() {
   return `
   <rect x="-8" y="-11" width="16" height="22" rx="3" fill="#fdfaf1" stroke="${ENCRE}" stroke-width="1.6"/>
@@ -494,35 +539,6 @@ export function degout() {
     <path d="M17 -5 q3 -3 6 0 q3 3 6 0"/><path d="M17 3 q3 -3 6 0 q3 3 6 0"/>
   </g>
   <path d="M20 -17 q3.5 5.5 0 8 q-3.5 -2.5 0 -8 Z" fill="#8fc9ff" stroke="#5a9be0" stroke-width=".8"/>`;
-}
-
-/** Bulle du fourneau : consignes, jauge et minuteur. */
-export function bulleFourneau() {
-  return `<g class="e5-pop">
-    <path d="M-92 -24 H92 Q98 -24 98 -18 V16 Q98 22 92 22 H-4 L-12 32 L-20 22 H-92 Q-98 22 -98 16 V-18 Q-98 -24 -92 -24 Z" fill="#fff" stroke="${ENCRE}" stroke-width="2"/>
-    <text class="e5-bf-titre" x="0" y="-5" text-anchor="middle" font-size="12.5" font-weight="600"></text>
-    <text class="e5-bf-sous" x="0" y="9" text-anchor="middle" font-size="9.5" fill="#6b5a88"></text>
-    <g class="e5-bf-jauge">
-      <rect x="-80" y="13" width="160" height="4" rx="2" fill="#efe6ff"/>
-      <rect class="e5-bf-barre" x="-80" y="13" width="160" height="4" rx="2" fill="#8f5cf7"/>
-    </g>
-    <g class="e5-bf-minuteur" style="display:none">
-      <circle cx="-72" cy="0" r="11" fill="none" stroke="#efe6ff" stroke-width="4"/>
-      <circle class="e5-bf-arc" cx="-72" cy="0" r="11" fill="none" stroke="#8f5cf7" stroke-width="4" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="69.1" transform="rotate(-90 -72 0)"/>
-      <path d="M-72 -5.5 V0 L-68 2.4" stroke="#4a1fa8" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
-    <g transform="translate(62 41)">
-      <g class="e5-bf-vitesse" data-e5="vitesse" role="button" tabindex="0" aria-pressed="false" style="display:none">
-        <rect x="-42" y="-20" width="84" height="42" fill="transparent"/>
-        <rect x="-34" y="-11" width="68" height="27" rx="13.5" fill="${ENCRE}"/>
-        <g class="e5-vitesse-corps">
-          <rect class="e5-vitesse-fond" x="-34" y="-14" width="68" height="27" rx="13.5" fill="#ffd23f" stroke="${ENCRE}" stroke-width="2"/>
-          <path class="e5-vitesse-texte" d="M-24 -6.5 L-16 -0.5 L-24 5.5 Z M-15 -6.5 L-7 -0.5 L-15 5.5 Z" fill="${ENCRE}"/>
-          <text class="e5-vitesse-texte" x="11" y="4.4" text-anchor="middle" font-size="13.5" font-weight="700" fill="${ENCRE}">60x</text>
-        </g>
-      </g>
-    </g>
-  </g>`;
 }
 
 /* ===================================================== Gâteau d'anniversaire */
@@ -712,7 +728,6 @@ function lieuxFeu(j0) {
     casserole: c,                                        // la casserole posée dessus
     four: pt(1.9, j, 8),                                 // la porte du four
     halo: { x: c.x, y: c.y - 4, r: 24 },                 // le cercle « touche ici »
-    bulle: { x: +(c.x - 4).toFixed(1), y: +(c.y - 81).toFixed(1) },   // la bulle des gestes
   };
 }
 
@@ -738,8 +753,8 @@ function rue() {
   <rect x="-1400" y="-1400" width="3200" height="3400" fill="#c9c5bd"/>
   ${qf([[-3.2, -3.2], [40, -3.2], [40, 40], [-3.2, 40]], '#dcd8d0')}
   ${tirets}
-  ${qf([[14.5, -3.2], [40, -3.2], [40, 40], [14.5, 40]], '#bfe07e')}
-  ${qf([[-3.2, 14.5], [14.5, 14.5], [14.5, 40], [-3.2, 40]], '#bfe07e')}
+  ${qf([[14.5, -40], [120, -40], [120, 120], [14.5, 120]], '#bfe07e')}
+  ${qf([[-60, 14.5], [14.5, 14.5], [14.5, 120], [-60, 120]], '#bfe07e')}
   ${ligne([14.5, -3.2], [14.5, 14.5])}${ligne([-3.2, 14.5], [14.5, 14.5])}
   ${ligne([-3.2, -3.2], [40, -3.2])}${ligne([-3.2, -3.2], [-3.2, 40])}`;
 }
@@ -920,12 +935,6 @@ function fourneauxIso() {
       </g>
     </g>`;
   }).join('');
-}
-
-/** Le plat prêt qui sautille au-dessus de son fourneau. */
-export function signePret(plat) {
-  return `<circle r="13" fill="#fff4c2" stroke="${ENCRE}" stroke-width="2"/>
-    <g transform="translate(0 1.5) scale(.46)">${plat}</g>`;
 }
 
 function comptoirIso() {

@@ -5,13 +5,16 @@
 //      vrais champs posés par-dessus ; le mot de passe est le code à 4
 //      chiffres trouvé en chemin ; l'écran apparaît ligne par ligne ;
 //   2. le livre de recettes dit quoi acheter ; au marché, on touche un étal
-//      pour ouvrir sa vitrine et acheter à l'unité (tout va au frigo) ;
+//      pour ouvrir sa vitrine et acheter à l'unité (tout va au panier, puis
+//      au frigo) ;
 //   3. les clients s'installent et commandent, chacun avec son exigence
 //      (« double chocolat », « sans sucre »…) ;
 //   4. au fourneau, le livre s'ouvre : on choisit la commande, on met dans la
-//      casserole les bons ingrédients du frigo, puis on prépare et on cuit.
-//      Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre
-//      (chacun a sa carte en bas de l'écran, avec son minuteur et son 60x) ;
+//      casserole les bons ingrédients du frigo. Puis la bulle du fourneau
+//      demande les ingrédients, puis chaque étape (on touche le fourneau) ;
+//      la barre se remplit, et la cuisson démarre, avec son minuteur et son
+//      bouton 60x au-dessus du fourneau. Il y a trois fourneaux : pendant
+//      qu'un plat cuit, on en lance un autre ;
 //   5. Pipistrelle sert. Un client très spécial (un machaon) commande la
 //      spécialité, puis laisse le mot de Clément et le cadeau.
 //
@@ -21,6 +24,10 @@
 // à zéro, on ne peut plus rien acheter (les clients paient en partant) ; si
 // elle ne peut vraiment plus finir les commandes, Pipistrelle propose de
 // recommencer la partie. Après deux essais ratés, le livre donne la liste exacte.
+//
+// L'écran du restaurant reprend la maquette de Clément : les menus sont
+// découpés dans images/hud/ et posés aux mêmes places (voir HUD plus bas).
+// Pipistrelle parle dans le Café chat, en bas à gauche.
 //
 // Tous les textes sont regroupés juste en dessous. Le mot et le cadeau
 // sont à écrire par Clément : TEXTES.lettre et TEXTES.cadeau.
@@ -35,9 +42,8 @@ import * as D from './cafe-dessins.js';
 const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
 const TEXTES = {
+  joueuse: 'Cyriel',   // le nom dans le bandeau, en haut
   nomCafe: 'Café de Cyriel',
-  nomMarche: 'Marché',
-  pieces: 'Pièces',
   ramasser: 'Ramasser les pièces',
   ouvert: 'Ouvert',
   panneauCafe: 'Café',
@@ -75,8 +81,8 @@ const TEXTES = {
   intro: 'Bienvenue dans ton café, cheffe Cyriel ! Moi, c’est Pipistrelle, ta serveuse. Ce soir, on rouvre.',
   livre: 'Le frigo est vide… Regarde d’abord le livre de recettes, pour savoir quoi acheter.',
   versMarche: 'Allons au marché faire les courses !',
-  marche: 'Touche un étal pour voir ce qu’il vend. Le livre et le frigo sont en haut, si besoin.',
-  astuceMarche: 'Le livre de recettes, en haut, dit tout ce qu’il faut acheter.',
+  marche: 'Touche un étal pour voir ce qu’il vend. Le livre de recettes et le panier (ton frigo) sont en bas à droite.',
+  astuceMarche: 'Le livre de recettes, en bas à droite, dit tout ce qu’il faut acheter.',
   achatDeteste: (a) => `${cap(a.partitif)} ? Tu es sûre ? Bon… c’est toi la cheffe.`,
   pasAssez: 'Plus assez de pièces ! Sers d’abord des clients : ils paient en partant.',
   bloquee: 'Oh non… il ne reste plus assez de pièces pour finir les commandes. On recommence la partie ?',
@@ -86,12 +92,12 @@ const TEXTES = {
   premiereCommande: 'Un client s’est installé ! Touche un fourneau : le livre de recettes te dira ce qu’il veut.',
   commandeSuivante: 'Touche un fourneau libre pour préparer une autre commande.',
   enParallele: 'Pendant que ça cuit, lance la commande suivante sur un autre fourneau : tu en as trois !',
-  cuissonEnCours: 'Ça cuit… En bas, le bouton jaune 60x accélère chaque plat.',
+  cuissonEnCours: 'Ça cuit… Le bouton jaune 60x, au-dessus du fourneau, accélère le plat.',
   rienAPreparer: 'Aucune autre commande pour l’instant.',
-  astuce60x: 'Pour aller plus vite : le bouton jaune 60x, en bas.',
+  astuce60x: 'Pour aller plus vite : le bouton jaune 60x, au-dessus du fourneau.',
   attenteClient: 'On attend le prochain client…',
-  preparation: 'Tout est dans la casserole. Au travail !',
-  vraiTemps: 'Comme dans le vrai jeu, la cuisson prend du vrai temps ! Pour ne pas attendre, touche le bouton jaune 60x, en bas.',
+  preparation: 'Touche le fourneau : sa bulle te montre quoi faire, étape par étape.',
+  vraiTemps: 'Comme dans le vrai jeu, la cuisson prend du vrai temps ! Pour ne pas attendre, touche le bouton jaune 60x, au-dessus du fourneau.',
   pret: (n) => `C’est prêt sur le fourneau ${n} ! Touche-le pour poser le plat sur le comptoir.`,
   pretSpecial: (n) => `Le gâteau est prêt sur le fourneau ${n} ! Touche-le pour le sortir du four.`,
   service: 'Je l’apporte !',
@@ -132,7 +138,9 @@ const TEXTES = {
     crepes: { nom: 'Crêpes à la crème de marron', dans: 'des crêpes', cuit: 'Les crêpes dorent dans la poêle…' },
     gateau: { nom: 'Gâteau rhubarbe et crème de marron', dans: 'ce gâteau', cuit: 'Le gâteau cuit… Ça sent bon la rhubarbe et la crème de marron.' },
   },
+  // Les étapes au fourneau : le nom sous la barre qui se remplit.
   gestes: {
+    ingredients: 'Ajouter les ingrédients',
     remuer: 'Remuer', etaler: 'Étaler la pâte', enfourner: 'Enfourner',
     verser: 'Verser la pâte', retourner: 'Retourner la crêpe', melanger: 'Mélanger',
   },
@@ -181,23 +189,69 @@ const TEXTES = {
   },
   frigo: { titre: 'Frigo', vide: 'Le frigo est vide. Les courses se font au marché !' },
   boutique: { acheter: 'Acheter', auFrigo: 'Au frigo :' },
-  hud: { recettes: 'Recettes', frigo: 'Frigo' },
+
+  // Le Café chat, en bas à gauche.
+  chat: {
+    canal: 'Café chat',
+    bienvenue: 'Bienvenue !',
+    pipistrelle: 'Pipistrelle',
+    saisie: 'Ton message…',
+    reponses: ['Hihi !', 'Message reçu, cheffe !', 'Je note, je note !'],   // Pipistrelle répond, à tour de rôle
+    niveau: (qui, n) => `${qui} passe au niveau ${n} !`,
+  },
+  // Le niveau dans la tasse, en haut à gauche : il passe à « fin » quand
+  // elle souffle ses bougies. L'expérience monte à chaque client servi.
+  niveau: { depart: 23, fin: 24, xp: 510, xpMax: 684, xpSuivant: 760, parClient: 40 },
+
+  // Les menus. Les boutons du décor font répondre Pipistrelle (messages).
+  hud: {
+    recettes: 'Livre de recettes',
+    frigo: 'Frigo',
+    fouet: 'Cuisiner',
+    niveau: (n) => `Niveau ${n}`,
+    xp: 'Expérience',
+    pieces: 'Pièces',
+    sonCouper: 'Couper le son',
+    sonRemettre: 'Remettre le son',
+    aide: 'Aide',
+    plein: 'Plein écran',
+    chatHaut: 'Remonter le chat',
+    chatBas: 'Descendre le chat',
+    envoyer: 'Envoyer',
+    etiquettes: {
+      carte: 'Carte', reglages: 'Réglages', porte: 'Quitter',
+      cadeau: 'Cadeaux', toques: 'Équipe', marmite: 'Cuisine', noeud: 'Serveuse', toque: 'Cheffe',
+      onglets: ['Café chat', 'Amis', 'Cuisine', 'Ustensiles'],
+    },
+    messages: {
+      carte: 'Une carte du quartier ? Ce soir, tout se passe ici, au café !',
+      reglages: 'Les réglages ? Tout est déjà parfait, cheffe.',
+      porte: 'Tu pars déjà ? Pas avant la fin du service !',
+      cadeau: 'Les cadeaux ? Patience… c’est pour la fin de la soirée.',
+      toques: 'L’équipe au complet : toi en cuisine, moi en salle !',
+      marmite: 'Pour cuisiner, touche un fourneau.',
+      noeud: 'Le nœud papillon, c’est mon uniforme de serveuse !',
+      toque: 'La toque de cheffe, c’est toi qui la portes !',
+      onglets: ['', 'Tes amis cuisiniers sont en congé ce soir.', 'Ce soir, la cuisine est rien qu’à toi.', 'Tous les ustensiles sont déjà au fourneau !'],
+    },
+    aideVide: 'Je suis là si tu as besoin, cheffe !',
+    pleinIndispo: 'Pas de plein écran sur cet appareil, désolée !',
+    fouetFerme: 'Le café n’a pas encore ouvert !',
+    fouetMarche: 'Les fourneaux sont au café : rentre pour cuisiner.',
+    fouetRien: 'Rien à cuisiner pour l’instant.',
+  },
 
   ariaEnveloppe: 'Enveloppe laissée par le client',
   ariaCadeau: 'Cadeau laissé par le client',
 
   fourneau: {
-    toucher: 'Touche le fourneau',
-    pret: 'C’est prêt !',
+    toucher: 'touche le fourneau',
     accelerer: 'Accélérer la cuisson 60 fois',
   },
-  // Les cartes des trois fourneaux, en bas de l'écran.
+  // Ce qui s'affiche au-dessus des fourneaux (pour les lecteurs d'écran).
   feux: {
     nom: (n) => `Fourneau ${n}`,
-    libre: 'Libre',
-    aToi: 'À toi !',
-    pret: 'Prêt !',
-    auMarche: 'Les fourneaux t’attendent au café : rentre pour cuisiner.',
+    pret: 'prêt !',
   },
 
   boutons: {
@@ -328,45 +382,108 @@ function verifier(cmd, pot) {
 const puces = (map, { toujours = false } = {}) => [...map].map(([k, n]) => `
   <span class="e5-ing">${icone(k)}<span>${esc(D.ARTICLES[k].nom)}</span>${n > 1 || toujours ? `<b>×${n}</b>` : ''}</span>`).join('');
 
+/* ================================================================ Menus */
+
+// Les menus sont découpés dans la maquette de Clément (912 × 1724 pixels) :
+// images/hud/gauche, centre, droite et bas. Chaque bloc garde sa place de la
+// maquette ; tout est mis à l'échelle de l'écran par --u (un pixel de la
+// maquette, calculé par cadrer()). Les zones se donnent en pixels de la
+// maquette : [x0, y0, x1, y1].
+const HUD = {
+  gauche: { x: 0, y: 0 },
+  centre: { x: 250, y: 2 },
+  droite: { x: 630, y: 16 },
+  bas: { x: 0, y: 1072 },
+};
+const ZONES = {
+  droite: {
+    carte: [634, 22, 682, 84], son: [682, 22, 726, 84], reglages: [726, 22, 774, 84],
+    aide: [774, 22, 818, 84], plein: [818, 22, 864, 86], porte: [864, 22, 910, 86],
+  },
+  bas: {
+    'onglet-0': [18, 1076, 96, 1178], 'onglet-1': [98, 1092, 172, 1182],
+    'onglet-2': [173, 1078, 248, 1178], 'onglet-3': [248, 1076, 322, 1178],
+    'chat-haut': [430, 1200, 476, 1244], 'chat-bas': [430, 1396, 476, 1456], envoyer: [414, 1458, 474, 1514],
+    recettes: [604, 1398, 708, 1496], fouet: [708, 1394, 798, 1502], frigo: [798, 1390, 910, 1496],
+    cadeau: [426, 1520, 562, 1646], toques: [562, 1524, 650, 1646], marmite: [650, 1530, 730, 1630],
+    noeud: [730, 1530, 826, 1630], toque: [826, 1514, 908, 1650],
+  },
+};
+const place = (bloc, [x0, y0, x1, y1]) => `--x:${x0 - bloc.x};--y:${y0 - bloc.y};--l:${x1 - x0};--h:${y1 - y0}`;
+
+function hudHtml() {
+  const H = TEXTES.hud;
+  const E = H.etiquettes;
+  const NOMS = {
+    carte: E.carte, son: H.sonCouper, reglages: E.reglages, aide: H.aide, plein: H.plein, porte: E.porte,
+    'chat-haut': H.chatHaut, 'chat-bas': H.chatBas, envoyer: H.envoyer,
+    recettes: H.recettes, fouet: H.fouet, frigo: H.frigo,
+    cadeau: E.cadeau, toques: E.toques, marmite: E.marmite, noeud: E.noeud, toque: E.toque,
+  };
+  const etiquette = (nom) => NOMS[nom] ?? E.onglets[+nom.split('-')[1]];
+  const zones = (bloc) => Object.entries(ZONES[bloc]).map(([nom, r]) => `
+        <button type="button" class="e5-zone e5-z" data-hud="${nom}" style="${place(HUD[bloc], r)}" aria-label="${esc(etiquette(nom))}">${nom === 'frigo' ? '<b class="e5-badge" hidden>0</b>' : ''}</button>`).join('');
+  const G = HUD.gauche;
+  const B = HUD.bas;
+  return `
+    <div class="e5-hud">
+      <div class="e5-bloc e5-bloc-gauche">
+        <span class="e5-bloqueur e5-z" style="${place(G, [0, 0, 256, 150])}"></span>
+        <span class="e5-bloqueur e5-z" style="${place(G, [10, 180, 232, 406])}"></span>
+        <img class="e5-bloc-img" src="images/hud/gauche.webp" alt="" draggable="false">
+        <svg class="e5-niveau e5-z" style="${place(G, [86, 38, 150, 86])}" viewBox="0 0 64 48" role="img"><text x="32" y="36" text-anchor="middle"></text></svg>
+        <div class="e5-xp e5-z" style="${place(G, [31, 107, 241, 135])}" role="progressbar" aria-label="${esc(H.xp)}" aria-valuemin="0"><span class="e5-xp-plein"></span><span class="e5-xp-texte"></span></div>
+        <span class="e5-pieces-icone e5-z" style="${place(G, [16, 252, 86, 304])}" aria-hidden="true"></span>
+        <div class="e5-pieces e5-z" style="${place(G, [92, 262, 210, 296])}" role="status" aria-label="${esc(H.pieces)}"><span>${PIECES_DEPART}</span></div>
+      </div>
+      <div class="e5-bloc e5-bloc-centre">
+        <img class="e5-bloc-img" src="images/hud/centre.webp" alt="" draggable="false">
+        <p class="e5-joueuse e5-z" style="${place(HUD.centre, [270, 16, 612, 64])}">${esc(TEXTES.joueuse)}</p>
+      </div>
+      <div class="e5-bloc e5-bloc-droite">
+        <img class="e5-bloc-img" src="images/hud/droite.webp" alt="" draggable="false">${zones('droite')}
+      </div>
+      <div class="e5-rallonge" aria-hidden="true"></div>
+      <div class="e5-bloc e5-bloc-bas">
+        <span class="e5-bloqueur e5-z" data-b="chat" style="${place(B, [0, 1140, 548, 1556])}"></span>
+        <span class="e5-bloqueur e5-z" style="${place(B, [16, 1074, 324, 1182])}"></span>
+        <span class="e5-bloqueur e5-z" data-b="plateaux" style="${place(B, [398, 1386, 912, 1670])}"></span>
+        <img class="e5-bloc-img" src="images/hud/bas.webp" alt="" draggable="false">
+        <img class="e5-panier e5-z" src="images/hud/panier.webp" style="${place(B, [796, 1394, 910, 1498])}" alt="" draggable="false">
+        <div class="e5-chat e5-z" style="${place(B, [34, 1190, 428, 1436])}" role="log" aria-live="polite" aria-label="${esc(TEXTES.chat.canal)}" tabindex="0"><div class="e5-fil"></div></div>
+        <form class="e5-saisie e5-z" style="${place(B, [96, 1478, 404, 1518])}" autocomplete="off"><input type="text" maxlength="80" enterkeyhint="send" autocomplete="off" placeholder="${esc(TEXTES.chat.saisie)}" aria-label="${esc(TEXTES.chat.saisie)}"></form>${zones('bas')}
+      </div>
+    </div>`;
+}
+
+// Au-dessus de chaque fourneau : la bulle parchemin (ce que le fourneau
+// demande, ou le plat prêt) et la barre à segments (une étape en cours, ou
+// la cuisson avec son minuteur et son bouton 60x).
+const SEGMENTS = 6;
+const POINTE = '<svg class="e5-sf-pointe" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 0 L9 11 L17 0"/></svg>';
+const surFeuHtml = (k) => `
+      <div class="e5-sf" data-k="${k}" data-etat="libre">
+        <button type="button" class="e5-sf-bulle"><span class="e5-sf-icones"></span>${POINTE}</button>
+        <div class="e5-sf-minuteur">
+          <div class="e5-sf-barre" aria-hidden="true">${'<span><i></i></span>'.repeat(SEGMENTS)}</div>
+          <div class="e5-sf-pied">
+            <span class="e5-sf-legende"></span>
+            <button type="button" class="e5-sf-vite" aria-pressed="false" hidden><svg viewBox="0 0 16 12" aria-hidden="true"><path d="M1 1 L7.5 6 L1 11 Z M8.5 1 L15 6 L8.5 11 Z"/></svg><span>60x</span></button>
+          </div>${POINTE}
+        </div>
+        <span class="e5-sf-tige" aria-hidden="true"></span>
+      </div>`;
+
 function gabarit() {
-  const T = TEXTES;
   const C = TEXTES.connexion;
   return `
   <div class="e5-jeu">
-    <header class="e5-haut">
-      <div class="e5-pieces" role="status" aria-label="${esc(T.pieces)}">${ICONE_PIECE}<span>${PIECES_DEPART}</span></div>
-      <p class="e5-nom">${esc(T.nomCafe)}</p>
-      <div class="e5-outils" hidden>
-        <button type="button" class="e5-outil" data-e5="hud-recettes"><svg viewBox="-12 -12 24 24" aria-hidden="true">${D.iconeLivre()}</svg><span>${esc(T.hud.recettes)}</span></button>
-        <button type="button" class="e5-outil" data-e5="hud-frigo"><svg viewBox="-12 -12 24 24" aria-hidden="true">${D.iconeFrigo()}</svg><span>${esc(T.hud.frigo)}</span><b class="e5-badge" hidden>0</b></button>
-      </div>
-    </header>
     <div class="e5-scene">
-      <svg class="e5-svg" role="img" aria-label="${esc(T.nomCafe)}" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg class="e5-svg" role="img" aria-label="${esc(TEXTES.nomCafe)}" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="e5-surfeux" hidden>${Array.from({ length: D.NB_FEUX }, (_, k) => surFeuHtml(k)).join('')}
+      </div>
       <div class="e5-voile"></div>
-    </div>
-    <footer class="e5-bas">
-      <div class="e5-feux" hidden>${[0, 1, 2].map((k) => `
-        <div class="e5-feu-carte" data-k="${k}" data-etat="libre">
-          <button type="button" class="e5-feu-bouton" data-e5="feu-${k}">
-            <svg class="e5-feu-icone" viewBox="-24 -24 48 48" aria-hidden="true"></svg>
-            <span class="e5-feu-texte"></span>
-          </button>
-          <span class="e5-feu-num" aria-hidden="true">${k + 1}</span>
-          <button type="button" class="e5-feu-vite" data-e5="vitesse-${k}" aria-pressed="false" hidden>
-            <svg viewBox="0 0 16 12" aria-hidden="true"><path d="M1 1 L7.5 6 L1 11 Z M8.5 1 L15 6 L8.5 11 Z"/></svg><span>60x</span>
-          </button>
-          <span class="e5-feu-barre" aria-hidden="true"><span></span></span>
-        </div>`).join('')}
-      </div>
-      <div class="e5-guide">
-        <svg class="e5-avatar" viewBox="-27 -29 54 54" aria-hidden="true">${D.pipistrelle()}</svg>
-        <div class="e5-bulle" aria-live="polite">
-          <p class="e5-texte"></p>
-          <div class="e5-boutons"></div>
-        </div>
-      </div>
-    </footer>
+    </div>${hudHtml()}
   </div>
   <div class="e5-login gc gc-en-charge">
     <img class="gc-flou" src="${esc(C.image)}" alt="" aria-hidden="true">
@@ -570,19 +687,43 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   /* ---------------------------------------------------- Cadrage de la scène */
 
   const zone = $('.e5-scene');
+  const surfeux = $('.e5-surfeux');     // bulles et minuteurs au-dessus des fourneaux
+  let feux = [];
   // Chaque vue a son cadre (la salle du café, la place du marché) : il tient
-  // toujours en entier à l'écran, le décor déborde autour.
+  // toujours en entier dans l'espace libre entre les menus ; le décor
+  // déborde autour, sous les menus.
   const CADRES = { cafe: D.CADRE_CAFE, marche: { x: 0, y: 0, l: D.LARGEUR, h: D.HAUTEUR } };
   let cadreCourant = CADRES.cafe;
+  const blocCentre = $('.e5-bloc-centre');
+  const repereChat = $('[data-b="chat"]');
+  const reperePlateaux = $('[data-b="plateaux"]');
   function cadrer() {
     const l = zone.clientWidth;
     const h = zone.clientHeight;
     if (!l || !h) return;
+    // Les menus : la maquette (912 × 1724) à l'échelle de l'écran.
+    const u = Math.max(0.3, Math.min(l / 912, h / 1724, 0.62));
+    racine.style.setProperty('--u', `${u.toFixed(4)}px`);
+    // L'espace libre : sous le bandeau, au-dessus des plateaux d'actions…
+    const r = zone.getBoundingClientRect();
+    const haut = blocCentre.getBoundingClientRect().bottom - r.top + 6;
+    const chat = repereChat.getBoundingClientRect();
     const c = cadreCourant;
-    const k = Math.min(l / c.l, h / c.h);
+    let bas = reperePlateaux.getBoundingClientRect().top - r.top - 6;
+    let k = Math.min(l / c.l, (bas - haut) / c.h);
+    // … ou au-dessus du chat, si la salle passerait derrière.
+    if ((l - c.l * k) / 2 < chat.right - r.left - 10) {
+      bas = chat.top - r.top - 6;
+      k = Math.min(l / c.l, (bas - haut) / c.h);
+    }
+    if (!(k > 0.2)) k = Math.min(l / c.l, h / c.h);   // écran minuscule : tant pis pour les menus
     const vl = l / k;
     const vh = h / k;
-    svg.setAttribute('viewBox', `${(c.x + (c.l - vl) / 2).toFixed(1)} ${(c.y + (c.h - vh) / 2).toFixed(1)} ${vl.toFixed(1)} ${vh.toFixed(1)}`);
+    const vx = c.x + c.l / 2 - l / 2 / k;
+    const vy = c.y + c.h / 2 - (haut + bas) / 2 / k;
+    svg.setAttribute('viewBox', `${vx.toFixed(1)} ${vy.toFixed(1)} ${vl.toFixed(1)} ${vh.toFixed(1)}`);
+    surfeux.style.setProperty('--z', Math.min(1.5, Math.max(0.8, k)).toFixed(3));
+    placerSurFeux();
   }
   const observateur = new ResizeObserver(cadrer);
   observateur.observe(zone);
@@ -606,22 +747,53 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     fleche.style.display = 'none';
   }
 
-  const bulleGuide = $('.e5-bulle');
-  const texte = $('.e5-texte');
-  const zoneBoutons = $('.e5-boutons');
+  // Pipistrelle parle dans le Café chat, en bas à gauche ; ses questions
+  // s'affichent en boutons sous son message.
+  const CH = TEXTES.chat;
+  const chat = $('.e5-chat');
+  const fil = $('.e5-fil');
+  const zoneChoix = document.createElement('div');
+  zoneChoix.className = 'e5-choix';
   let parole = 0;
   let texteDeFond = '';
-  let ephemere = 0;
-  let ephemereActif = false;
+
+  const defiler = () => requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
+  function derniereLigne() {
+    const l = fil.lastElementChild;
+    return l === zoneChoix ? l.previousElementSibling : l;
+  }
+  // Une ligne du chat. La même ligne deux fois de suite clignote au lieu de
+  // se répéter ; les boutons de réponse restent toujours en dessous.
+  function ligne(qui, t, classe = 'e5-de-pipi') {
+    const der = derniereLigne();
+    if (der && der.dataset.qui === qui && der.dataset.texte === t) {
+      der.classList.remove('e5-flash');
+      void der.offsetWidth;
+      der.classList.add('e5-flash');
+      defiler();
+      return der;
+    }
+    const p = document.createElement('p');
+    p.className = `e5-ligne ${classe}`;
+    p.dataset.qui = qui;
+    p.dataset.texte = t;
+    const nom = document.createElement('b');
+    nom.textContent = `${qui} :`;
+    p.append(nom, ` ${t}`);
+    fil.insertBefore(p, zoneChoix.parentNode === fil ? zoneChoix : null);
+    while (fil.childElementCount > 60 && fil.firstElementChild !== zoneChoix) fil.firstElementChild.remove();
+    defiler();
+    return p;
+  }
+  ligne(CH.canal, CH.bienvenue, 'e5-systeme');
 
   // Pipistrelle parle ; avec des choix, renvoie l'indice du bouton touché.
   function dire(t, choix = []) {
     const tour = ++parole;
-    texte.textContent = t;
     texteDeFond = t;
-    ephemereActif = false;
-    zoneBoutons.replaceChildren();
-    animer(bulleGuide, [{ transform: 'translateY(3px)', opacity: 0.55 }, { transform: 'none', opacity: 1 }], { duree: 240, garder: false });
+    zoneChoix.replaceChildren();
+    zoneChoix.remove();
+    ligne(CH.pipistrelle, t);
     if (!choix.length) return Promise.resolve(-1);
     return new Promise((resolve) => {
       choix.forEach((libelle, i) => {
@@ -632,33 +804,82 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
         b.addEventListener('click', () => {
           if (tour !== parole) return;
           bip('clic', 0.4);
-          zoneBoutons.replaceChildren();
+          zoneChoix.replaceChildren();
+          zoneChoix.remove();
           resolve(i);
         });
-        zoneBoutons.append(b);
+        zoneChoix.append(b);
       });
+      fil.append(zoneChoix);
+      defiler();
     });
   }
-  // Remarque passagère : le texte revient ensuite, les boutons restent.
-  function direUnInstant(t, ms) {
-    const jeton = ++ephemere;
-    const tour = parole;
-    ephemereActif = true;
-    texte.textContent = t;
-    dormir(ms).then(() => {
-      if (jeton !== ephemere) return;
-      ephemereActif = false;
-      if (tour === parole) texte.textContent = texteDeFond;
-    });
+  // Remarque passagère : une ligne de plus (les boutons restent en dessous).
+  function direUnInstant(t) {
+    ligne(CH.pipistrelle, t);
   }
+
+  // Elle peut écrire aussi ; Pipistrelle répond.
+  const saisie = $('.e5-saisie');
+  const champ = saisie.querySelector('input');
+  let reponse = 0;
+  saisie.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const t = champ.value.trim();
+    if (!t) return;
+    champ.value = '';
+    bip('clic', 0.4);
+    ligne(TEXTES.joueuse, t, 'e5-de-moi');
+    const r = CH.reponses.length ? CH.reponses[reponse++ % CH.reponses.length] : '';
+    if (r) dormir(900).then(() => { if (vivant) ligne(CH.pipistrelle, r); });
+  });
 
   let pieces = PIECES_DEPART;
   const bourse = $('.e5-pieces');
   const compteur = bourse.querySelector('span');
+  const bourseIcone = $('.e5-pieces-icone');
   function ajouterPieces(n) {
     pieces += n;
     compteur.textContent = String(pieces);
     animer(bourse, [{ transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duree: 260, garder: false });
+  }
+
+  // Le niveau dans la tasse et la barre d'expérience.
+  const N = TEXTES.niveau;
+  let niveau = memoire.lire('cafe-fini', false) ? N.fin : N.depart;
+  let xp = niveau >= N.fin ? 0 : N.xp;
+  let xpMax = niveau >= N.fin ? N.xpSuivant : N.xpMax;
+  const blocNiveau = $('.e5-niveau');
+  const xpBarre = $('.e5-xp');
+  function majXp() {
+    blocNiveau.querySelector('text').textContent = String(niveau);
+    blocNiveau.setAttribute('aria-label', TEXTES.hud.niveau(niveau));
+    xpBarre.querySelector('.e5-xp-plein').style.width = `${Math.round((xp / xpMax) * 1000) / 10}%`;
+    xpBarre.querySelector('.e5-xp-texte').textContent = `${xp} / ${xpMax}`;
+    xpBarre.setAttribute('aria-valuenow', String(xp));
+    xpBarre.setAttribute('aria-valuemax', String(xpMax));
+  }
+  majXp();
+  function gagnerXp(n) {
+    xp = Math.min(xpMax, xp + n);
+    majXp();
+    animer(xpBarre, [{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duree: 420, garder: false });
+  }
+  // Elle souffle ses bougies : la barre se remplit, elle passe au niveau suivant.
+  async function monterNiveau() {
+    if (niveau >= N.fin) return;
+    gagnerXp(xpMax - xp);
+    await dormir(800);
+    if (!vivant) return;
+    niveau = N.fin;
+    xp = 0;
+    xpMax = N.xpSuivant;
+    majXp();
+    bip('eclat');
+    animer(blocNiveau, [{ transform: 'scale(1)' }, { transform: 'scale(1.7) rotate(-8deg)' }, { transform: 'scale(1)' }], { duree: 750, easing: 'cubic-bezier(.3,1.5,.5,1)', garder: false });
+    const c = centre(blocNiveau);
+    coeurs(c.x, c.y, 10);
+    ligne(CH.canal, CH.niveau(TEXTES.joueuse, niveau), 'e5-systeme');
   }
 
   const pipi = svgEl('g', { class: 'e5-pipi' }, calques.volants);
@@ -671,7 +892,6 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
   const vues = { cafe: $('[data-vue="cafe"]'), marche: $('[data-vue="marche"]') };
   const voile = $('.e5-voile');
-  const titre = $('.e5-nom');
   let vue = 'cafe';
   let enTransition = false;
   const attenteCafe = [];
@@ -684,7 +904,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     cadrer();
     vue = nom;
     ambiance(nom === 'marche' ? 'marche' : 'salle');
-    titre.textContent = nom === 'marche' ? TEXTES.nomMarche : TEXTES.nomCafe;
+    montrerSurFeux();
     await animer(voile, [{ opacity: 1 }, { opacity: 0 }], { duree: 320 });
     enTransition = false;
     if (nom === 'cafe') attenteCafe.splice(0).forEach((r) => r());
@@ -696,9 +916,10 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   const frigo = new Map();
   const nb = (k) => frigo.get(k) || 0;
   const pot = new Map();               // la casserole, posée sur le fourneau
-  const outils = $('.e5-outils');
-  const boutonRecettes = $('[data-e5="hud-recettes"]');
-  const boutonFrigo = $('[data-e5="hud-frigo"]');
+  let outilsPrets = false;              // le livre et le frigo, après les présentations
+  const boutonRecettes = $('[data-hud="recettes"]');
+  const boutonFrigo = $('[data-hud="frigo"]');
+  const panier = $('.e5-panier');
   const badge = $('.e5-badge');
   function majBadge() {
     const total = [...frigo.values()].reduce((a, b) => a + b, 0);
@@ -759,8 +980,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     return fenetre({ titre: TEXTES.frigo.titre, couleur: '#4aa3df', genre: 'frigo', classe: 'e5-boutique e5-fen-frigo', corps, sousTitre: TEXTES.livreTexte.totalFrigo(total) });
   }
 
-  // Les boutons du haut (livre et frigo) : consultables à tout moment, sauf
-  // pendant qu'on remplit la casserole.
+  // Le livre et le panier (le frigo), en bas à droite : consultables à tout
+  // moment, sauf pendant qu'on remplit la casserole.
   function boutonHaut(genre, ouvrir) {
     return () => {
       if (enTransition) return;
@@ -1008,8 +1229,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     bip('piece');
     const icon = carte.querySelector('svg');
     rebondir(icon);
-    envolee(D.ARTICLES[k].dessin(), centre(icon), centre(boutonFrigo.querySelector('svg')), { duree: 620, taille: 34 })
-      .then(() => rebondir(boutonFrigo));
+    envolee(D.ARTICLES[k].dessin(), centre(icon), centre(panier), { duree: 620, taille: 34 })
+      .then(() => rebondir(panier));
     if (DETESTES.includes(k) && !commentes.has(k)) {
       commentes.add(k);
       direUnInstant(TEXTES.achatDeteste(D.ARTICLES[k]), 3400);
@@ -1107,7 +1328,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     const porteFrigo = $('[data-e5="frigo-porte"]');
     await animer(porteFrigo, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(.15)' }], { duree: 300, easing: 'ease-out' });
     const vers = versEcran(L.frigo.x, L.frigo.y);
-    const de = centre($('.e5-avatar'));
+    const de = centre(panier);
     const montres = [...new Set(liste)].slice(0, 9);
     await Promise.all(montres.map((k, i) => dormir(i * 110).then(() => envolee(D.ARTICLES[k].dessin(), de, vers, { duree: 600 }))));
     bip('plouf');
@@ -1133,37 +1354,42 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     minuteurs.add(porteMinuteur);
   }
 
+  let cafeOuvert = false;
   function ouvrirCafe() {
-    plateauFeux.hidden = false;
+    cafeOuvert = true;
+    montrerSurFeux();
     $('[data-e5="pancarte"]').textContent = TEXTES.ouvert;
     animer($('.e5-pancarte'), [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duree: 320, garder: false });
   }
 
   surToucher($('[data-e5="frigo"]'), () => {
-    if (vue === 'cafe' && !fenetreCourante && !enTransition && !outils.hidden) { bip('clic', 0.5); fenetreFrigo(); }
+    if (vue === 'cafe' && !fenetreCourante && !enTransition && outilsPrets) { bip('clic', 0.5); fenetreFrigo(); }
   });
 
   /* -------------------------------------------------------- Les fourneaux */
 
   // Trois fourneaux : on lance un plat sur l'un pendant que d'autres cuisent.
-  // Chacun a sa carte en bas de l'écran : ce qui cuit, le minuteur, le 60x.
+  // Au-dessus de chacun, comme dans le jeu d'origine : une bulle parchemin
+  // quand il demande quelque chose (les ingrédients, une étape, ou le plat
+  // prêt à sortir), une barre à segments pendant une étape et pendant la
+  // cuisson, avec le minuteur et le bouton 60x.
   // Un fourneau est « libre », en « gestes » (on prépare), en « cuisson »,
   // ou « pret » (on touche pour poser le plat sur le comptoir).
-  const plateauFeux = $('.e5-feux');
-  const feux = L.feux.map((lieu, k) => {
+  feux = L.feux.map((lieu, k) => {
     const el = $(`[data-e5="fourneau-${k}"]`);
-    const carte = plateauFeux.querySelector(`[data-k="${k}"]`);
+    const ui = surfeux.querySelector(`[data-k="${k}"]`);
     return {
-      k, lieu, el,
+      k, lieu, el, ui,
       casserole: el.querySelector('.e5-casserole'),
-      carte,
-      bouton: carte.querySelector('.e5-feu-bouton'),
-      vite: carte.querySelector('.e5-feu-vite'),
-      icone: carte.querySelector('.e5-feu-icone'),
-      texte: carte.querySelector('.e5-feu-texte'),
-      barre: carte.querySelector('.e5-feu-barre span'),
+      bulle: ui.querySelector('.e5-sf-bulle'),
+      icones: ui.querySelector('.e5-sf-icones'),
+      legende: ui.querySelector('.e5-sf-legende'),
+      vite: ui.querySelector('.e5-sf-vite'),
+      tige: ui.querySelector('.e5-sf-tige'),
+      segments: [...ui.querySelectorAll('.e5-sf-barre i')],
+      anims: [],
       etat: 'libre', cmd: null, r: null, extra: null,
-      fait: 0, total: 0, vitesse: 1, signe: null, vu: {},
+      fait: 0, total: 0, vitesse: 1, vu: {},
     };
   });
 
@@ -1176,46 +1402,113 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`;
   };
 
-  // Met la carte d'un fourneau à jour (sans retoucher ce qui n'a pas changé).
-  function majCarte(f) {
+  // Ce qui s'affiche au-dessus d'un fourneau : rien ('libre'), la bulle
+  // ('demande', 'pret') ou la barre ('action', 'cuisson').
+  function etatUI(f, etat) {
+    if (f.ui.dataset.etat === etat) return;
+    f.ui.dataset.etat = etat;
+    f.vu = {};
+    for (const a of f.anims) a.cancel();
+    f.anims = [];
+    if (etat !== 'cuisson') for (const s of f.segments) s.style.width = '0%';
+    f.vite.hidden = etat !== 'cuisson';
+    placerSurFeux();
+  }
+  function remplirBulle(f, dessins, n, aria) {
+    f.icones.innerHTML = dessins;
+    f.icones.style.setProperty('--n', String(Math.min(3, n)));
+    f.icones.classList.toggle('e5-sf-une', n === 1);
+    f.bulle.setAttribute('aria-label', aria);
+  }
+  // La bulle demande quelque chose : on touche le fourneau (ou la bulle).
+  function demander(f, dessins, n, aria) {
+    remplirBulle(f, dessins, n, aria);
+    f.ui.dataset.etat = '';
+    etatUI(f, 'demande');
+    f.bulle.classList.remove('e5-sf-pop');
+    void f.bulle.offsetWidth;
+    f.bulle.classList.add('e5-sf-pop');
+  }
+  // La barre se remplit, segment après segment, avec le nom de l'étape dessous.
+  function agir(f, legende, ms) {
+    f.legende.textContent = legende;
+    etatUI(f, 'action');
+    const d = ms / V / SEGMENTS;
+    f.anims = f.segments.map((s, i) => s.animate([{ width: '0%' }, { width: '100%' }], { duration: d, delay: i * d, fill: 'both', easing: 'linear' }));
+    return f.anims[f.anims.length - 1].finished.catch(() => {});
+  }
+
+  // Met l'affichage d'un fourneau à jour (sans retoucher ce qui n'a pas changé).
+  // Pendant les gestes, c'est preparer() qui mène la bulle et la barre.
+  function majFeu(f) {
     const T = TEXTES.feux;
-    const n = f.k + 1;
-    const icone = f.r ? `p-${f.r.plat}` : 'casserole';
-    const texte = { libre: T.libre, gestes: T.aToi, cuisson: duree(f.total - f.fait), pret: T.pret }[f.etat];
-    const aria = f.etat === 'libre' ? `${T.nom(n)} : ${T.libre}`
-      : f.etat === 'cuisson' ? `${T.nom(n)} : ${f.r.nom}, ${texte}`
-        : f.etat === 'pret' ? `${T.nom(n)} : ${f.r.nom}, ${T.pret}` : `${T.nom(n)} : ${f.r.nom}`;
-    const v = f.vu;
-    if (v.etat !== f.etat) { f.carte.dataset.etat = f.etat; v.etat = f.etat; }
-    if (v.icone !== icone) {
-      // le plat en gros plan ; la casserole vide, un peu plus loin
-      f.icone.setAttribute('viewBox', f.r ? '-19 -18 38 34' : '-24 -24 48 48');
-      f.icone.innerHTML = f.r ? D.PLATS[f.r.plat]({ vapeur: false }) : `<g transform="translate(0 -1) scale(.9)">${D.iconeCasserole()}</g>`;
-      v.icone = icone;
+    if (f.etat === 'libre') { etatUI(f, 'libre'); return; }
+    if (f.etat === 'pret') {
+      if (f.ui.dataset.etat !== 'pret') {
+        remplirBulle(f, `<svg class="e5-sf-plat" viewBox="-19 -18 38 34" aria-hidden="true">${D.PLATS[f.r.plat]({ vapeur: false })}</svg>`, 1, `${T.nom(f.k + 1)} : ${f.r.nom}, ${T.pret}`);
+        etatUI(f, 'pret');
+      }
+      return;
     }
-    if (v.texte !== texte) { f.texte.textContent = texte; v.texte = texte; }
-    if (v.aria !== aria) { f.bouton.setAttribute('aria-label', aria); v.aria = aria; }
-    const vite = f.etat === 'cuisson';
-    if (v.vite !== vite) { f.vite.hidden = !vite; v.vite = vite; }
+    if (f.etat !== 'cuisson') return;
+    etatUI(f, 'cuisson');
+    const v = f.vu;
+    const texte = duree(f.total - f.fait);
+    if (v.texte !== texte) { f.legende.textContent = texte; v.texte = texte; }
+    const q = Math.round((f.total ? f.fait / f.total : 0) * SEGMENTS * 100);   // en centièmes de segment
+    if (v.q !== q) {
+      f.segments.forEach((s, i) => { s.style.width = `${Math.max(0, Math.min(100, q - i * 100))}%`; });
+      v.q = q;
+    }
     const presse = String(f.vitesse > 1);
     if (v.presse !== presse) { f.vite.setAttribute('aria-pressed', presse); v.presse = presse; }
-    const p = f.etat === 'cuisson' && f.total ? Math.round((f.fait / f.total) * 100) : 0;
-    if (v.p !== p) { f.barre.style.width = `${p}%`; v.p = p; }
   }
-  feux.forEach(majCarte);
 
-  // Le bouton 60x de chaque fourneau : accélère (ou ralentit) ce plat-là,
-  // même depuis le marché. Chaque plat démarre à vitesse normale.
+  // Les bulles et les barres se placent au-dessus de leur fourneau, la pointe
+  // sur la casserole. Si elles se gênent (fourneaux voisins), celle du fond
+  // monte au-dessus de celle de devant, reliée à son fourneau par un trait.
+  let enFete = false;
+  function montrerSurFeux() {
+    surfeux.hidden = !(cafeOuvert && vue === 'cafe' && !enFete);
+    placerSurFeux();
+  }
+  function placerSurFeux() {
+    if (surfeux.hidden || !feux.length) return;
+    const lz = zone.clientWidth;
+    const places = [];
+    for (const f of [...feux].reverse()) {          // du fourneau de devant à celui du fond
+      if (f.ui.dataset.etat === 'libre' || !f.ui.dataset.etat) continue;
+      const boite = f.ui.getBoundingClientRect();
+      const pointe = [...f.ui.querySelectorAll('.e5-sf-pointe')].find((x) => x.getClientRects().length);
+      if (!pointe) continue;
+      const pr = pointe.getBoundingClientRect();
+      const px = pr.left + pr.width / 2 - boite.left;   // la pointe, dans la bulle
+      const py = pr.bottom - boite.top;
+      const w = boite.width;
+      const c = versEcran(f.lieu.casserole.x, f.lieu.casserole.y - 15);
+      const x = Math.max(4, Math.min(c.x - px, lz - w - 4));
+      let y = c.y - py;
+      let tige = 0;
+      const gene = () => places.some((q) => x < q.x1 + 3 && x + w > q.x0 - 3 && y < q.y1 + 3 && y + py > q.y0 - 3);
+      while (tige < 260 && gene()) { y -= 4; tige += 4; }
+      f.ui.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      f.tige.style.cssText = tige ? `display:block;left:${(px - 1).toFixed(1)}px;top:${py.toFixed(1)}px;height:${tige}px` : '';
+      places.push({ x0: x, y0: y, x1: x + w, y1: y + py });
+      if (tige) places.push({ x0: x + px - 3, x1: x + px + 3, y0: y + py, y1: y + py + tige });
+    }
+  }
+
+  // Le bouton 60x de chaque fourneau : accélère (ou ralentit) ce plat-là.
+  // Chaque plat démarre à vitesse normale.
   for (const f of feux) {
     f.vite.setAttribute('aria-label', TEXTES.fourneau.accelerer);
-    f.vite.addEventListener('click', () => {
+    f.vite.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (f.etat !== 'cuisson') return;
       f.vitesse = f.vitesse > 1 ? 1 : ACCELERATION;
       bip(f.vitesse > 1 ? 'vol' : 'clic', 0.6);
-      majCarte(f);
+      majFeu(f);
     });
-    // Au marché, les cartes rappellent où sont les fourneaux.
-    f.bouton.addEventListener('click', () => { if (vue !== 'cafe') direUnInstant(TEXTES.feux.auMarche, 2600); });
   }
 
   // Une seule horloge pour tous les plats en cuisson.
@@ -1232,7 +1525,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
         if (f.etat !== 'cuisson') continue;
         f.fait = Math.min(f.total, f.fait + dt * f.vitesse * V);
         if (f.fait >= f.total) platPret(f); else encore = true;
-        majCarte(f);
+        majFeu(f);
       }
       horloge = encore ? requestAnimationFrame(pas) : 0;
     };
@@ -1250,14 +1543,11 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     f.el.classList.remove('e5-four-chaud', 'e5-feu');
     f.el.classList.add('e5-fourneau-pret');
     bip('ding');
-    f.signe = svgEl('g', { 'pointer-events': 'none' }, calques.bulles);
-    f.signe.innerHTML = `<g class="e5-pret-saute">${D.signePret(D.PLATS[f.r.plat]({ vapeur: false }))}</g>`;
-    placer(f.signe, f.lieu.casserole.x, f.lieu.casserole.y - 30);
-    majCarte(f);
+    majFeu(f);
     signaler();
   }
 
-  // Attend qu'on touche un fourneau, dans la salle ou par sa carte en bas.
+  // Attend qu'on touche un fourneau, dans la salle ou par sa bulle.
   // annuler() retire l'attente (elle donne alors null).
   function attendreFeu() {
     let finir = () => {};
@@ -1271,11 +1561,12 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       for (const f of feux) {
         const h = (e) => {
           if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          if (e.target.closest && e.target.closest('.e5-sf-vite')) return;
           if (vue !== 'cafe' || enTransition || fenetreCourante) return;
           e.preventDefault();
           finir(f);
         };
-        for (const [el, type] of [[f.el, 'click'], [f.el, 'keydown'], [f.bouton, 'click']]) {
+        for (const [el, type] of [[f.el, 'click'], [f.el, 'keydown'], [f.ui, 'click']]) {
           el.addEventListener(type, h);
           ecoutes.push([el, type, h]);
         }
@@ -1284,36 +1575,6 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     });
     return { promesse, annuler: () => finir(null) };
   }
-
-  // La bulle des gestes, au-dessus du fourneau où l'on prépare.
-  const bulleFour = (() => {
-    const g = svgEl('g', { class: 'e5-bulle-four', 'pointer-events': 'none' }, calques.bulles);
-    g.style.display = 'none';
-    g.innerHTML = D.bulleFourneau();
-    const pop = g.firstElementChild;
-    const q = (s) => g.querySelector(s);
-    const [titreB, sous, jauge, barre, minuteur] = ['.e5-bf-titre', '.e5-bf-sous', '.e5-bf-jauge', '.e5-bf-barre', '.e5-bf-minuteur'].map(q);
-    minuteur.style.display = 'none';
-    return {
-      sur(f) { placer(g, f.lieu.bulle.x, f.lieu.bulle.y); },
-      etape(t, s) {
-        if (g.style.display === 'none') {
-          g.style.display = '';
-          pop.classList.remove('e5-pop');
-          void pop.getBoundingClientRect();
-          pop.classList.add('e5-pop');
-        }
-        jauge.style.display = '';
-        titreB.textContent = t;
-        sous.textContent = s;
-        barre.style.transform = 'scaleX(0)';
-      },
-      remplir(ms) {
-        return animer(barre, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duree: ms, easing: 'ease-in-out' });
-      },
-      cacher() { g.style.display = 'none'; },
-    };
-  })();
 
   async function tomber(f, k, delai) {
     await dormir(delai);
@@ -1380,14 +1641,16 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     cmd.surComptoir = { n, x: place.x, y: place.y, g: pose };
   }
 
-  // Le contenu de la casserole va sur le fourneau f ; on fait les gestes,
-  // puis la cuisson démarre et on est libre de lancer autre chose.
+  // Le contenu de la casserole va sur le fourneau f. Sa bulle demande les
+  // ingrédients, puis chaque geste : on touche, la barre se remplit. Puis la
+  // cuisson démarre et on est libre de lancer autre chose.
   let premiereCuisson = true;
   async function preparer(f, { cmd, extra }) {
     const r = recette(cmd.recette);
+    const T = TEXTES.fourneau;
+    const nom = TEXTES.feux.nom(f.k + 1);
     cmd.etat = 'cuisine';
     Object.assign(f, { etat: 'gestes', cmd, r, extra, fait: 0, total: r.cuisson * 60, vitesse: 1 });
-    majCarte(f);
     const contenu = [...pot].flatMap(([k, n]) => Array(n).fill(k));
     for (const [k, n] of pot) frigo.set(k, nb(k) - n);
     for (const k of [...frigo.keys()]) if (!nb(k)) frigo.delete(k);
@@ -1395,31 +1658,36 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     majBadge();
 
     dire(TEXTES.preparation);
-    await Promise.all(contenu.map((k, j) => tomber(f, k, j * 150)));
+    montrer(f.lieu.halo.x, f.lieu.halo.y, f.lieu.halo.r, false);
+    demander(f, contenu.map((k) => icone(k)).join(''), contenu.length, `${nom} : ${T.toucher} (${TEXTES.gestes.ingredients})`);
+    await toucher(f.el, f.ui);
+    bip('clic', 0.4);
+    await Promise.all([
+      agir(f, TEXTES.gestes.ingredients, 500 + contenu.length * 150),
+      ...contenu.map((k, j) => tomber(f, k, j * 150)),
+    ]);
     bip('plouf');
     secouerCasserole(f);
 
-    bulleFour.sur(f);
-    montrer(f.lieu.halo.x, f.lieu.halo.y, f.lieu.halo.r, false);
     for (let i = 0; i < r.gestes.length; i++) {
-      bulleFour.etape(TEXTES.gestes[r.gestes[i]], `${TEXTES.fourneau.toucher} (${i + 1}/${r.gestes.length})`);
-      await toucher(f.el, f.bouton);
+      const g = r.gestes[i];
+      demander(f, `<svg viewBox="-24 -24 48 48" aria-hidden="true">${D.ICONES_GESTES[g]()}</svg>`, 1, `${nom} : ${T.toucher} (${TEXTES.gestes[g]})`);
+      await toucher(f.el, f.ui);
       bip('clic', (i + 1) / r.gestes.length);
-      await Promise.all([geste(f, r.gestes[i]), bulleFour.remplir(700)]);
+      await Promise.all([geste(f, g), agir(f, TEXTES.gestes[g], 900)]);
     }
     cacherGuide();
-    bulleFour.cacher();
 
     f.etat = 'cuisson';
     f.el.classList.add(r.four ? 'e5-four-chaud' : 'e5-feu');
     bip('feu');
-    majCarte(f);
+    majFeu(f);
     lancerHorloge();
     if (premiereCuisson) {
       premiereCuisson = false;
-      direUnInstant(TEXTES.vraiTemps, 6500);
+      direUnInstant(TEXTES.vraiTemps);
     } else {
-      direUnInstant(r.cuit, 2400);
+      direUnInstant(r.cuit);
     }
   }
 
@@ -1428,10 +1696,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   async function sortirPlat(f, enFond) {
     const { cmd, r, extra } = f;
     bip('clic', 1);
-    if (f.signe) { f.signe.remove(); f.signe = null; }
     f.el.classList.remove('e5-fourneau-pret');
     Object.assign(f, { etat: 'libre', cmd: null, r: null, extra: null, vitesse: 1 });
-    majCarte(f);
+    majFeu(f);
     if (cmd.special) {
       cmd.objets = await fete(cmd, f);
       cmd.etat = 'partie';
@@ -1532,6 +1799,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       if (c.bulle) { c.bulle.remove(); c.bulle = null; }
       cmd.etat = 'servie';
       bip('plouf');
+      gagnerXp(N.parClient);
       poser();
       await voler(pipi, L.pipi.x, L.pipi.y, 850, { hauteur: 26 });
       pipi.classList.remove('e5-vole');
@@ -1550,7 +1818,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       ramasseurs.delete(ramasser);
       const de = versEcran(x, y);
       g.remove();
-      envolee(D.pieceSeule(), de, centre(bourse.querySelector('svg')), { taille: 28, boite: '-12 -12 24 24', duree: 600 })
+      envolee(D.pieceSeule(), de, centre(bourseIcone), { taille: 28, boite: '-12 -12 24 24', duree: 600 })
         .then(() => { ajouterPieces(n); bip('piece'); });
     };
     ramasseurs.add(ramasser);
@@ -1614,12 +1882,9 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     })();
   }
 
-  // Ce que dit Pipistrelle pendant le service, sans répéter ce qui est déjà
-  // affiché ; une remarque passagère reste le temps d'être lue.
+  // Ce que dit Pipistrelle pendant le service, sans répéter son dernier conseil.
   function conseiller(t) {
-    if (texteDeFond === t) return;
-    if (ephemereActif) { texteDeFond = t; return; }
-    dire(t);
+    if (texteDeFond !== t) dire(t);
   }
 
   // Le livre s'ouvre au fourneau f : on choisit la commande, on remplit la
@@ -1752,7 +2017,8 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
 
     // Le gâteau sort du four et vient au centre, en grand.
     dire(T.attends);
-    plateauFeux.hidden = true;
+    enFete = true;
+    montrerSurFeux();
     ambiance(null);   // la musique se tait : place à la chanson
     placer(support, f.lieu.casserole.x, f.lieu.casserole.y);
     await Promise.all([
@@ -1834,6 +2100,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       animer(g.firstElementChild, [{ transform: 'none' }, { transform: 'translateY(-14px)' }, { transform: 'none' }, { transform: 'translateY(-9px)' }, { transform: 'none' }], { duree: 900, easing: 'ease-out', garder: false });
     }
     dire(T.bravo);
+    monterNiveau();
     await dormir(1500);
 
     // Le machaon dépose l'enveloppe et le cadeau sur le présentoir.
@@ -2097,6 +2364,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       memoire.ecrire('cafe-relance', false);
       $('.e5-login').remove();
     } else await connexion();
+    document.body.classList.add('e5-en-jeu');   // le bouton du son passe dans les menus
 
     if (memoire.lire('cafe-fini', false)) {
       for (;;) {
@@ -2107,7 +2375,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     }
 
     await dire(TEXTES.intro, [TEXTES.boutons.intro]);
-    outils.hidden = false;
+    outilsPrets = true;
     await dire(TEXTES.livre, [TEXTES.boutons.voirLivre]);
     await livreConsultation();
     await dire(TEXTES.versMarche, [TEXTES.boutons.marche]);
@@ -2147,6 +2415,75 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     }
   }
 
+  /* ------------------------------------------------------------ Les menus */
+
+  const H = TEXTES.hud;
+  const surMenu = (nom, f) => {
+    const b = $(`[data-hud="${nom}"]`);
+    if (b) b.addEventListener('click', (e) => { e.stopPropagation(); f(b); });
+  };
+
+  // Les boutons du décor : Pipistrelle répond.
+  for (const nom of ['carte', 'reglages', 'porte', 'cadeau', 'toques', 'marmite', 'noeud', 'toque']) {
+    surMenu(nom, () => { bip('clic', 0.4); direUnInstant(H.messages[nom]); });
+  }
+  // Les onglets du chat : le premier, c'est le Café chat.
+  for (let i = 0; i < 4; i++) {
+    surMenu(`onglet-${i}`, () => {
+      bip('clic', 0.4);
+      if (i === 0) defiler(); else direUnInstant(H.messages.onglets[i]);
+    });
+  }
+  const pas = () => chat.clientHeight * 0.6;
+  surMenu('chat-haut', () => chat.scrollBy({ top: -pas(), behavior: 'smooth' }));
+  surMenu('chat-bas', () => chat.scrollBy({ top: pas(), behavior: 'smooth' }));
+  surMenu('envoyer', () => saisie.requestSubmit());
+
+  // « ? » : Pipistrelle répète son dernier conseil.
+  surMenu('aide', () => { bip('clic', 0.4); ligne(CH.pipistrelle, texteDeFond || H.aideVide); });
+
+  // La note de musique coupe ou remet le son (comme le bouton des autres étapes).
+  const zoneSon = $('[data-hud="son"]');
+  function majSon() {
+    const coupe = typeof son.estCoupe === 'function' && son.estCoupe();
+    zoneSon.setAttribute('aria-pressed', String(coupe));
+    zoneSon.setAttribute('aria-label', coupe ? H.sonRemettre : H.sonCouper);
+  }
+  surMenu('son', () => {
+    const global = document.getElementById('son');
+    if (global) global.click();
+    else { son.eveiller(); son.basculer(); }
+    majSon();
+  });
+  majSon();
+
+  surMenu('plein', () => {
+    bip('clic', 0.4);
+    const d = document;
+    if (d.fullscreenElement) { d.exitFullscreen().catch(() => {}); return; }
+    const el = d.documentElement;
+    if (d.fullscreenEnabled && el.requestFullscreen) el.requestFullscreen().catch(() => direUnInstant(H.pleinIndispo));
+    else direUnInstant(H.pleinIndispo);
+  });
+
+  // Le fouet : comme toucher le bon fourneau (le plat prêt d'abord, puis
+  // l'étape en attente, puis un fourneau libre s'il y a une commande).
+  surMenu('fouet', () => {
+    if (vue !== 'cafe') { direUnInstant(H.fouetMarche); return; }
+    if (!cafeOuvert) { direUnInstant(H.fouetFerme); return; }
+    if (fenetreCourante || enTransition) return;
+    const f = feux.find((x) => x.etat === 'pret')
+      || feux.find((x) => x.etat === 'gestes' && x.ui.dataset.etat === 'demande')
+      || (commandes.some((c) => c.etat === 'assise') && feux.find((x) => x.etat === 'libre'))
+      || null;
+    if (!f) {
+      bip('non');
+      direUnInstant(feux.some((x) => x.etat === 'cuisson') ? TEXTES.cuissonEnCours : H.fouetRien);
+      return;
+    }
+    f.el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+  });
+
   ambiance('salle');
   scenario().catch((e) => { if (vivant) console.error(e); });
   if (debug !== null) {
@@ -2167,6 +2504,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     for (const id of minuteurs) clearTimeout(id);
     cancelAnimationFrame(horloge);
     observateur.disconnect();
+    document.body.classList.remove('e5-en-jeu');
     delete window.__e5;
   };
 }
