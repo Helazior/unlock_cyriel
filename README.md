@@ -23,8 +23,13 @@ python3 -m http.server 8000
 | `?etape=5` | la course jusqu'au café |
 | `?etape=6&debug=vite` | le café, avec tout 4 fois plus rapide |
 
-La progression est gardée dans le navigateur ; l'adresse suit aussi l'étape en
-cours, donc `?etape=N` suffit pour reprendre sur un autre appareil.
+La progression est gardée dans le navigateur. Sans le code secret, `?etape=N`
+ne permet pas d'aller plus loin que l'étape déjà atteinte sur l'appareil, et
+`?debug` est ignoré. Avec le code, tout est permis : `?etape=6&debug=vite&cle=CODE`
+(c'est aussi ce qu'il faut pour reprendre sur un autre appareil). Seule
+l'empreinte du code est dans `js/jeu.js` ; pour le changer,
+`node outils/cle.mjs nouveaucode` donne l'empreinte à y recopier. En local
+(`localhost`), le code n'est pas demandé.
 
 ## Organisation
 
