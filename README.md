@@ -20,7 +20,8 @@ python3 -m http.server 8000
 | `?etape=1` | repart du début |
 | `?etape=2&debug=carte` | étape 2 avec toute la grotte révélée, pour vérifier le plan |
 | `?etape=4&debug=vite` | le marais, avec tout 4 fois plus rapide (pour les essais) |
-| `?etape=5&debug=vite` | le café, avec tout 4 fois plus rapide |
+| `?etape=5` | la course jusqu'au café |
+| `?etape=6&debug=vite` | le café, avec tout 4 fois plus rapide |
 
 La progression est gardée dans le navigateur ; l'adresse suit aussi l'étape en
 cours, donc `?etape=N` suffit pour reprendre sur un autre appareil.
@@ -38,6 +39,7 @@ js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
 js/etapes/etape4.js   étape 4 — le marais : cinq papillons en même temps, chaque ponte suivie dans une loupe
+js/etapes/etape-course.js  étape 5 — la course (lance course.js)
 js/etapes/course.js   la petite course jusqu'au café : un toucher d'un pied = un pas
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
