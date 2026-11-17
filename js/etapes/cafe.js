@@ -52,7 +52,7 @@ const TEXTES = {
   // ci-dessous servent aux lecteurs d'écran et aux messages.
   connexion: {
     image: 'images/connexion-cafe.webp',
-    titre: 'GoodGame Café',
+    titre: 'GoodCyriel Café',
     jouerMaintenant: 'Jouer maintenant !',
     pseudo: 'Nom d’utilisateur / E-mail',
     pseudoValeur: 'Cyriel',
@@ -1995,7 +1995,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     const a = ecran.querySelector('.gc-affiche').getBoundingClientRect();
     const auNiveau = (fraction) => ((a.top - haut + a.height * fraction) / H) * 100;
     const arrets = [
-      { a: auNiveau(0.02), ms: 1000 },   // juste avant « GoodGame »
+      { a: auNiveau(0.02), ms: 1000 },   // juste avant « GoodCyriel »
       { a: auNiveau(0.43), ms: 1300 },   // juste avant « Café »
     ];
     let p = 0;

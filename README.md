@@ -178,7 +178,7 @@ leurs positions sont en % de l'image dans `style.css` (section « Écran de
 connexion »). Pour changer d'image, garder la même mise en page ou reprendre
 ces pourcentages. L'écran apparaît comme sur une vieille connexion :
 « Connexion au serveur… », puis l'image qui se dessine ligne par ligne, avec
-deux arrêts juste avant « GoodGame » et « Café » ; le pseudo se remplit tout
+deux arrêts juste avant « GoodCyriel » et « Café » ; le pseudo se remplit tout
 seul. Les fois suivantes, c'est trois fois plus rapide. « Mot de passe
 oublié ? » donne l'indice ; « Jouer maintenant ! » ramène au mot de passe.
 
