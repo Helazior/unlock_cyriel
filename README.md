@@ -162,15 +162,15 @@ En tête de `js/etapes/cafe.js` :
   à la tomate, omelette, mousse au chocolat) viennent de la maquette du livre ;
   la mousse prend trois heures au frais, comme dans le jeu d'origine ;
 - `CLIENTS` : les joueurs du marché qui viennent manger, leur table, leur
-  recette et leur exigence (`plus` : en plus de la recette, `sans` : à ne pas
-  mettre). Il y a trois tables : les trois derniers attendent qu'une table se
+  recette (la recette du livre, sans ingrédient en plus ou en moins). Il y a
+  trois tables : les trois derniers attendent qu'une table se
   libère. Le dernier client, c'est Clément, avec le machaon de l'étape 4 sur
   l'épaule : il commande la spécialité ;
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix ;
   `EPICES` : les épices (vanille, persil, basilic, piment), qui restent au
   frigo et relèvent un plat au moment de cuisiner (`TEXTES.epice` : le bonus) ;
   `PIECES_DEPART` (30) : les pièces au départ. Les courses des trois premières
-  commandes coûtent 19 pièces. À zéro, on ne peut plus rien acheter : la roue
+  commandes coûtent 15 pièces. À zéro, on ne peut plus rien acheter : la roue
   de la fortune et le camion du chef font regagner des pièces ; si elle ne
   peut vraiment plus finir les commandes, Pipistrelle propose aussi de
   recommencer la partie (sans repasser par la connexion).
