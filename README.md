@@ -215,6 +215,12 @@ le livre de recettes, le fouet (touche le bon fourneau à sa place) et le panier
 (le frigo). Sur un écran plus large que la maquette, les plateaux d'actions se
 prolongent jusqu'au bord.
 
+Dans la salle, Cyriel en cheffe (toque, tablier rose) va d'un fourneau à
+l'autre pendant la cuisson, prend les plats au comptoir et les apporte aux
+tables ; Pipistrelle, perchée près du frigo, ne sert plus : elle donne les
+conseils et discute dans le chat (et allume les bougies à la fête). Chaque
+partie commence au niveau 23 ; le gâteau de la fin fait passer au niveau 24.
+
 Écran couché (téléphone en paysage, ordinateur) : les menus se placent comme
 dans le jeu d'origine. Le chat va dans le coin en bas à gauche, les plateaux
 d'actions dans le coin en bas à droite, et la salle (ou le marché) se cadre
