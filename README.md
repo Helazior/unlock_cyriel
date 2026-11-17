@@ -82,12 +82,13 @@ recherche de ne pas l'indexer.
 
 ### Le marais (étape 4)
 
-Tout se passe en même temps. Cinq femelles arrivent l'une après l'autre (une
-toutes les 7 secondes). On touche une femelle et on dit qui elle est
+En deux temps. D'abord, cinq femelles arrivent coup sur coup (une toutes les
+3,5 secondes) et il faut toutes les placer. On touche une femelle et on dit qui elle est
 (« Quel est ce papillon ? », trois noms au choix ; son nom reste ensuite
 écrit sous elle), puis on touche sa plante hôte (elle la goûte en
-tambourinant avec ses pattes). Après la ponte, la plante est remplacée par une
-loupe où se joue le petit jeu de l'espèce, pendant que les autres continuent.
+tambourinant avec ses pattes). Quand toutes ont pondu, les plantes sont remplacées
+une à une par des loupes où se jouent les petits jeux des espèces, tous en
+même temps, chacun avec ses bulles de dialogue.
 Une loupe qui a besoin de Cyriel brille ; la toucher l'agrandit sur place.
 Une femelle qu'on fait trop attendre, ou un danger laissé trop longtemps
 (mésange, crue, fourmis : la loupe clignote en rouge), coûte une vie (5 vies) ;
