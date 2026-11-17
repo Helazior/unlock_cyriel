@@ -105,8 +105,11 @@ une à une par des loupes où se jouent les petits jeux des espèces, tous en
 même temps, chacun avec ses bulles de dialogue.
 Une loupe qui a besoin de Cyriel brille ; la toucher l'agrandit sur place.
 Une femelle qu'on fait trop attendre, ou un danger laissé trop longtemps
-(mésange, crue, fourmis : la loupe clignote en rouge), coûte une vie (5 vies) ;
-à zéro, l'étape recommence. Les durées sont dans `REGLES`, en tête de
+(mésange, crue, fourmis : la loupe clignote en rouge), coûte une vie (5 vies),
+comme une mauvaise fourmi pour l'azuré ou une mauvaise silique pour l'aurore.
+À zéro, l'étape recommence ; mais une fois toutes les femelles posées, les
+œufs servent de point de sauvegarde : on reprend aux loupes (le bouton « Tout
+recommencer » repart du début). Les durées sont dans `REGLES`, en tête de
 `js/etapes/etape4.js`.
 
 | Papillon | Plante | Le petit jeu |
