@@ -74,6 +74,13 @@ node outils/verifier-grotte.mjs carte
 Le script vérifie que la sortie, le chiffre et tous les moustiques restent
 atteignables, et affiche un plan en caractères.
 
+Dans le passage qui mène aux spéléos, des stalactites et des pierres se
+décrochent du plafond, chacune à son rythme, après avoir tremblé (avec un petit
+craquement). La chauve-souris a 1 cœur au départ, gagne 1 cœur par moustique
+gobé (3 au plus) et en perd 1 par pierre reçue ; à zéro, elle repart du début
+du passage. Colonnes, rythmes et cœurs : `CHUTES`, `COEURS` et `REPRISE` en
+tête de `js/etapes/etape2.js`.
+
 ## Mise en ligne
 
 Tous les chemins sont relatifs : le dossier peut être servi tel quel depuis
