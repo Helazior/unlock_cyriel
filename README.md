@@ -42,7 +42,7 @@ js/etapes/etape4.js   étape 4 — le marais : cinq papillons en même temps, ch
 js/etapes/etape-course.js  étape 5 — la course (lance course.js)
 js/etapes/course.js   la petite course jusqu'au café : un toucher d'un pied = un pas
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
-js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
+js/etapes/cafe.js     étape 6 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
 js/etapes/cafe-dessins.js  dessins de la salle du café et de la place du marché (en isométrique) et des personnages
 js/etapes/clins-doeil.js  Cyriel et Clément dessinés d'après photos, en clins d'œil dans la grotte, le marais, le café et le marché
 js/code.js            le code à 4 chiffres, utilisé par les étapes 2, 3 et 5
@@ -160,11 +160,23 @@ En tête de `js/etapes/cafe.js` :
   de secondes) ;
 - `CLIENTS` : la table, la recette et l'exigence de chaque client
   (`plus` : en plus de la recette, `sans` : à ne pas mettre) ;
-- `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix.
+- `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix ;
+  `PIECES_DEPART` (30) : les pièces au départ. Les courses des trois premières
+  commandes coûtent 24 pièces, et chaque client content en laisse 10. À zéro,
+  on ne peut plus rien acheter ; si elle ne peut vraiment plus finir les
+  commandes, Pipistrelle propose de recommencer la partie (sans repasser par la
+  connexion).
 - `TEXTES.fete` : la fin, où le gâteau du machaon est pour elle ; `age` donne
   les bougies en chiffres.
 - `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
   marché) et leur volume.
+
+L'écran de connexion « GoodCyriel Café » (textes dans `TEXTES.connexion`,
+dessins dans `decorLogin` et `afficheLogin` de `cafe-dessins.js`) apparaît
+comme sur une vieille connexion : « Connexion au serveur… », puis l'image qui
+se dessine ligne par ligne, avec deux arrêts juste avant le nom du café. Les
+fois suivantes, c'est trois fois plus rapide. « Mot de passe oublié ? » donne
+l'indice ; « Jouer maintenant » et « S'inscrire » ramènent au mot de passe.
 
 Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre. Chacun
 a sa carte en bas de l'écran (ce qui cuit, le minuteur, son bouton 60x).
