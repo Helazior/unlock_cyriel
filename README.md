@@ -171,12 +171,16 @@ En tête de `js/etapes/cafe.js` :
 - `SONS` : les sons de fond (le piano de la salle, les oiseaux et la fontaine du
   marché) et leur volume.
 
-L'écran de connexion « GoodCyriel Café » (textes dans `TEXTES.connexion`,
-dessins dans `decorLogin` et `afficheLogin` de `cafe-dessins.js`) apparaît
-comme sur une vieille connexion : « Connexion au serveur… », puis l'image qui
-se dessine ligne par ligne, avec deux arrêts juste avant le nom du café. Les
-fois suivantes, c'est trois fois plus rapide. « Mot de passe oublié ? » donne
-l'indice ; « Jouer maintenant » et « S'inscrire » ramènent au mot de passe.
+L'écran de connexion est l'image `images/connexion-cafe.webp`, affichée en
+entier (floutée autour si l'écran n'a pas la même forme). Les vrais champs et
+boutons sont posés par-dessus, transparents, exactement sur ceux du dessin :
+leurs positions sont en % de l'image dans `style.css` (section « Écran de
+connexion »). Pour changer d'image, garder la même mise en page ou reprendre
+ces pourcentages. L'écran apparaît comme sur une vieille connexion :
+« Connexion au serveur… », puis l'image qui se dessine ligne par ligne, avec
+deux arrêts juste avant « GoodGame » et « Café » ; le pseudo se remplit tout
+seul. Les fois suivantes, c'est trois fois plus rapide. « Mot de passe
+oublié ? » donne l'indice ; « Jouer maintenant ! » ramène au mot de passe.
 
 Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre. Chacun
 a sa carte en bas de l'écran (ce qui cuit, le minuteur, son bouton 60x).
