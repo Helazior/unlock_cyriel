@@ -167,7 +167,8 @@ En tête de `js/etapes/cafe.js` :
   libère. Le dernier client, c'est Clément, avec le machaon de l'étape 4 sur
   l'épaule : il commande la spécialité ;
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix ;
-  `EPICES` : les épices (vanille, persil, basilic, piment), qui restent au
+  `EPICES` : les épices (vanille, persil, basilic, piment, à l'épicerie ou à
+  la roue), qui restent au
   frigo et relèvent un plat au moment de cuisiner (`TEXTES.epice` : le bonus) ;
   `PIECES_DEPART` (30) : les pièces au départ. Les courses des trois premières
   commandes coûtent 15 pièces. À zéro, on ne peut plus rien acheter : la roue
