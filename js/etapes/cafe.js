@@ -314,11 +314,13 @@ const ARRIVEES = [600, 5200, 6400];   // millisecondes avant chaque arrivée
 // Les aliments que Cyriel n'aime pas : vendus au marché comme les autres.
 const DETESTES = ['poivron', 'aubergine', 'gingembre', 'coriandre', 'balsamique', 'vin', 'champagne', 'huitres'];
 
+// Chaque étal a son dessin au marché (cabane, cagettes, panneau, kiosque) ;
+// couleur : son store et le haut de sa vitrine, fonce : son enseigne.
 const ETALS = [
-  { cle: 'primeur', nom: 'Primeur', couleur: '#f06fa4', fonce: '#c64c82', articles: ['rhubarbe', 'poivron', 'aubergine', 'coriandre', 'gingembre'] },
+  { cle: 'primeur', nom: 'Primeur', couleur: '#e8553a', fonce: '#b33a20', articles: ['rhubarbe', 'poivron', 'aubergine', 'coriandre', 'gingembre'] },
   { cle: 'epicerie', nom: 'Épicerie', couleur: '#8f5cf7', fonce: '#6a3fd0', articles: ['farine', 'sucre', 'chocolat', 'marron', 'balsamique'] },
-  { cle: 'cremerie', nom: 'Crèmerie', couleur: '#4aa3df', fonce: '#2f7fb8', articles: ['lait', 'oeufs', 'beurre'] },
-  { cle: 'cave', nom: 'Cave et marée', couleur: '#3fae8c', fonce: '#2b8a6c', articles: ['vin', 'champagne', 'huitres'] },
+  { cle: 'cremerie', nom: 'Crèmerie', couleur: '#3ea6c9', fonce: '#1f7896', articles: ['lait', 'oeufs', 'beurre'] },
+  { cle: 'cave', nom: 'Cave et marée', couleur: '#e39b2d', fonce: '#a8641a', articles: ['vin', 'champagne', 'huitres'] },
 ];
 
 const PRIX = {
@@ -385,25 +387,31 @@ const puces = (map, { toujours = false } = {}) => [...map].map(([k, n]) => `
 /* ================================================================ Menus */
 
 // Les menus sont découpés dans la maquette de Clément (912 × 1724 pixels) :
-// images/hud/gauche, centre, droite et bas. Chaque bloc garde sa place de la
-// maquette ; tout est mis à l'échelle de l'écran par --u (un pixel de la
-// maquette, calculé par cadrer()). Les zones se donnent en pixels de la
-// maquette : [x0, y0, x1, y1].
+// images/hud/gauche, centre, droite, chat et actions. Debout, chaque bloc
+// garde sa place de la maquette (les plateaux d'actions par-dessus le coin
+// du chat) ; couché (paysage), le chat va dans le coin en bas à gauche et
+// les plateaux dans le coin en bas à droite, comme dans le jeu d'origine.
+// Tout est mis à l'échelle de l'écran par --u (un pixel de la maquette,
+// calculé par cadrer()). Les zones se donnent en pixels de la maquette :
+// [x0, y0, x1, y1].
 const HUD = {
   gauche: { x: 0, y: 0 },
   centre: { x: 250, y: 2 },
   droite: { x: 630, y: 16 },
-  bas: { x: 0, y: 1072 },
+  chat: { x: 0, y: 1072 },
+  actions: { x: 398, y: 1384 },
 };
 const ZONES = {
   droite: {
     carte: [634, 22, 682, 84], son: [682, 22, 726, 84], reglages: [726, 22, 774, 84],
     aide: [774, 22, 818, 84], plein: [818, 22, 864, 86], porte: [864, 22, 910, 86],
   },
-  bas: {
+  chat: {
     'onglet-0': [18, 1076, 96, 1178], 'onglet-1': [98, 1092, 172, 1182],
     'onglet-2': [173, 1078, 248, 1178], 'onglet-3': [248, 1076, 322, 1178],
     'chat-haut': [430, 1200, 476, 1244], 'chat-bas': [430, 1396, 476, 1456], envoyer: [414, 1458, 474, 1514],
+  },
+  actions: {
     recettes: [604, 1398, 708, 1496], fouet: [708, 1394, 798, 1502], frigo: [798, 1390, 910, 1496],
     cadeau: [426, 1520, 562, 1646], toques: [562, 1524, 650, 1646], marmite: [650, 1530, 730, 1630],
     noeud: [730, 1530, 826, 1630], toque: [826, 1514, 908, 1650],
@@ -424,7 +432,8 @@ function hudHtml() {
   const zones = (bloc) => Object.entries(ZONES[bloc]).map(([nom, r]) => `
         <button type="button" class="e5-zone e5-z" data-hud="${nom}" style="${place(HUD[bloc], r)}" aria-label="${esc(etiquette(nom))}">${nom === 'frigo' ? '<b class="e5-badge" hidden>0</b>' : ''}</button>`).join('');
   const G = HUD.gauche;
-  const B = HUD.bas;
+  const CH = HUD.chat;
+  const A = HUD.actions;
   return `
     <div class="e5-hud">
       <div class="e5-bloc e5-bloc-gauche">
@@ -444,14 +453,19 @@ function hudHtml() {
         <img class="e5-bloc-img" src="images/hud/droite.webp" alt="" draggable="false">${zones('droite')}
       </div>
       <div class="e5-rallonge" aria-hidden="true"></div>
-      <div class="e5-bloc e5-bloc-bas">
-        <span class="e5-bloqueur e5-z" data-b="chat" style="${place(B, [0, 1140, 548, 1556])}"></span>
-        <span class="e5-bloqueur e5-z" style="${place(B, [16, 1074, 324, 1182])}"></span>
-        <span class="e5-bloqueur e5-z" data-b="plateaux" style="${place(B, [398, 1386, 912, 1670])}"></span>
-        <img class="e5-bloc-img" src="images/hud/bas.webp" alt="" draggable="false">
-        <img class="e5-panier e5-z" src="images/hud/panier.webp" style="${place(B, [796, 1394, 910, 1498])}" alt="" draggable="false">
-        <div class="e5-chat e5-z" style="${place(B, [34, 1190, 428, 1436])}" role="log" aria-live="polite" aria-label="${esc(TEXTES.chat.canal)}" tabindex="0"><div class="e5-fil"></div></div>
-        <form class="e5-saisie e5-z" style="${place(B, [96, 1478, 404, 1518])}" autocomplete="off"><input type="text" maxlength="80" enterkeyhint="send" autocomplete="off" placeholder="${esc(TEXTES.chat.saisie)}" aria-label="${esc(TEXTES.chat.saisie)}"></form>${zones('bas')}
+      <div class="e5-bloc e5-bloc-chat">
+        <span class="e5-bloqueur e5-z" data-b="chat" style="${place(CH, [0, 1140, 548, 1556])}"></span>
+        <span class="e5-bloqueur e5-z" style="${place(CH, [16, 1074, 324, 1182])}"></span>
+        <img class="e5-bloc-img" src="images/hud/chat.webp" alt="" draggable="false">
+        <div class="e5-chat e5-z" style="${place(CH, [34, 1190, 428, 1436])}" role="log" aria-live="polite" aria-label="${esc(TEXTES.chat.canal)}" tabindex="0"><div class="e5-fil"></div></div>
+        <form class="e5-saisie e5-z" style="${place(CH, [96, 1478, 404, 1518])}" autocomplete="off"><input type="text" maxlength="80" enterkeyhint="send" autocomplete="off" placeholder="${esc(TEXTES.chat.saisie)}" aria-label="${esc(TEXTES.chat.saisie)}"></form>${zones('chat')}
+      </div>
+      <div class="e5-bloc e5-bloc-actions">
+        <span class="e5-repere e5-z" data-b="plateaux" style="${place(A, [420, 1388, 912, 1668])}"></span>
+        <span class="e5-bloqueur e5-z" style="${place(A, [600, 1388, 912, 1516])}"></span>
+        <span class="e5-bloqueur e5-z" style="${place(A, [420, 1516, 912, 1668])}"></span>
+        <img class="e5-bloc-img" src="images/hud/actions.webp" alt="" draggable="false">
+        <img class="e5-panier e5-z" src="images/hud/panier.webp" style="${place(A, [796, 1394, 910, 1498])}" alt="" draggable="false">${zones('actions')}
       </div>
     </div>`;
 }
@@ -548,6 +562,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
       <g class="e5-fleche" style="display:none"><path class="e5-fleche-anim" d="M-8 -18 H8 V-7 H15 L0 7 L-15 -7 H-8 Z" fill="#7a3cf0" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></g>
     </g>`;
 
+  const arreterPromeneurs = D.animerPromeneurs(svg.querySelector('[data-vue="marche"]'));
   const calques = {
     plateau: $('.e5-calque-plateau'),
     clients: $('.e5-calque-clients'),
@@ -692,7 +707,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
   // Chaque vue a son cadre (la salle du café, la place du marché) : il tient
   // toujours en entier dans l'espace libre entre les menus ; le décor
   // déborde autour, sous les menus.
-  const CADRES = { cafe: D.CADRE_CAFE, marche: { x: 0, y: 0, l: D.LARGEUR, h: D.HAUTEUR } };
+  const CADRES = { cafe: D.CADRE_CAFE, marche: D.CADRE_MARCHE };
   let cadreCourant = CADRES.cafe;
   const blocCentre = $('.e5-bloc-centre');
   const repereChat = $('[data-b="chat"]');
@@ -701,27 +716,44 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     const l = zone.clientWidth;
     const h = zone.clientHeight;
     if (!l || !h) return;
-    // Les menus : la maquette (912 × 1724) à l'échelle de l'écran.
-    const u = Math.max(0.3, Math.min(l / 912, h / 1724, 0.62));
+    // Couché (paysage) ou debout : les menus changent de place (voir HUD),
+    // et leur taille suit la hauteur ou la largeur de l'écran.
+    const paysage = l > h;
+    racine.dataset.mise = paysage ? 'paysage' : 'portrait';
+    const u = paysage ? Math.max(0.34, Math.min(h / 1050, 0.62)) : Math.max(0.3, Math.min(l / 912, h / 1724, 0.62));
     racine.style.setProperty('--u', `${u.toFixed(4)}px`);
-    // L'espace libre : sous le bandeau, au-dessus des plateaux d'actions…
+    // L'espace libre pour la salle : sous le bandeau, et au choix au-dessus
+    // des menus du bas, entre le chat et les plateaux, ou au-dessus des
+    // plateaux en laissant le chat de côté. On garde celui où elle est la
+    // plus grande.
     const r = zone.getBoundingClientRect();
-    const haut = blocCentre.getBoundingClientRect().bottom - r.top + 6;
-    const chat = repereChat.getBoundingClientRect();
+    const boite = (el) => {
+      const b = el.getBoundingClientRect();
+      return { x0: b.left - r.left, y0: b.top - r.top, x1: b.right - r.left, y1: b.bottom - r.top };
+    };
+    const m = 6;
+    const haut = boite(blocCentre).y1 + m;
+    const chat = boite(repereChat);
+    const plat = boite(reperePlateaux);
     const c = cadreCourant;
-    let bas = reperePlateaux.getBoundingClientRect().top - r.top - 6;
-    let k = Math.min(l / c.l, (bas - haut) / c.h);
-    // … ou au-dessus du chat, si la salle passerait derrière.
-    if ((l - c.l * k) / 2 < chat.right - r.left - 10) {
-      bas = chat.top - r.top - 6;
-      k = Math.min(l / c.l, (bas - haut) / c.h);
+    const espaces = [
+      { x0: 0, x1: l, y0: haut, y1: Math.min(chat.y0, plat.y0) - m },
+      { x0: chat.x1 + m, x1: plat.x0 - m, y0: haut, y1: h - m },
+      { x0: chat.x1 + m, x1: l - chat.x1 - m, y0: haut, y1: plat.y0 - m },
+    ];
+    let e = null;
+    let k = 0;
+    for (const x of espaces) {
+      const kx = Math.min((x.x1 - x.x0) / c.l, (x.y1 - x.y0) / c.h);
+      if (kx > k) { k = kx; e = x; }
     }
-    if (!(k > 0.2)) k = Math.min(l / c.l, h / c.h);   // écran minuscule : tant pis pour les menus
-    const vl = l / k;
-    const vh = h / k;
-    const vx = c.x + c.l / 2 - l / 2 / k;
-    const vy = c.y + c.h / 2 - (haut + bas) / 2 / k;
-    svg.setAttribute('viewBox', `${vx.toFixed(1)} ${vy.toFixed(1)} ${vl.toFixed(1)} ${vh.toFixed(1)}`);
+    if (!e || k < 0.2) {                 // écran minuscule : tant pis pour les menus
+      e = { x0: 0, x1: l, y0: 0, y1: h };
+      k = Math.min(l / c.l, h / c.h);
+    }
+    const vx = c.x + c.l / 2 - (e.x0 + e.x1) / 2 / k;
+    const vy = c.y + c.h / 2 - (e.y0 + e.y1) / 2 / k;
+    svg.setAttribute('viewBox', `${vx.toFixed(1)} ${vy.toFixed(1)} ${(l / k).toFixed(1)} ${(h / k).toFixed(1)}`);
     surfeux.style.setProperty('--z', Math.min(1.5, Math.max(0.8, k)).toFixed(3));
     placerSurFeux();
   }
@@ -2504,6 +2536,7 @@ function demarrer({ scene, son, fx, memoire, debug, aller: allerEtape, numero })
     for (const id of minuteurs) clearTimeout(id);
     cancelAnimationFrame(horloge);
     observateur.disconnect();
+    arreterPromeneurs();
     document.body.classList.remove('e5-en-jeu');
     delete window.__e5;
   };

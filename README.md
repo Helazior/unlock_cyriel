@@ -199,6 +199,25 @@ le livre de recettes, le fouet (touche le bon fourneau à sa place) et le panier
 (le frigo). Sur un écran plus large que la maquette, les plateaux d'actions se
 prolongent jusqu'au bord.
 
+Écran couché (téléphone en paysage, ordinateur) : les menus se placent comme
+dans le jeu d'origine. Le chat va dans le coin en bas à gauche, les plateaux
+d'actions dans le coin en bas à droite, et la salle (ou le marché) se cadre
+entre les deux. Les menus suivent alors la hauteur de l'écran. Le chat et les
+plateaux sont deux images (`images/hud/chat.webp` et `actions.webp`) ; le coin
+du chat, caché par les plateaux sur la maquette, a été reconstitué. En
+paysage, les vitrines des étals mettent tous leurs produits sur une rangée.
+
+Le marché reprend la capture du jeu d'origine : un pré en losange, des murets
+de pierre aux coins, une fontaine à statue dans sa haie, des pas japonais, la
+girouette, la borne à incendie, le tableau d'affichage et son oiseau, le banc,
+l'oranger. Chaque étal a son dessin : la cabane de la crèmerie, les cagettes du
+primeur, le panneau lumineux de l'épicerie (guirlande et ballons), le kiosque
+de la cave (fanions, et un nid sur le toit). Les joueurs sont les mêmes
+qu'avant, et ils vivent : la plupart se promènent (leur parcours est dans
+`marche()`, `js/etapes/cafe-dessins.js`), Rachou sautille, Estel se balance
+sur le banc, Clément fait coucou. Le cadre du marché (`CADRE_MARCHE`) garde
+toujours les quatre étals et le panneau du café à l'écran.
+
 Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre.
 Toucher un fourneau libre ouvre le livre. Au-dessus du fourneau, une bulle
 parchemin demande les ingrédients, puis chaque étape (une icône) : on touche,
