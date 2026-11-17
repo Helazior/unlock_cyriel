@@ -37,7 +37,7 @@ js/dessin.js          dessins partagés (cœur, chauve-souris)
 js/etapes/etape1.js   étape 1 — les deux boutons
 js/etapes/etape2.js   étape 2 — la grotte en écholocation
 js/etapes/etape3.js   étape 3 — peindre le mammouth et la femme sur la paroi
-js/etapes/etape4.js   étape 4 — le marais : cinq papillons à faire pondre en même temps, avec des vies
+js/etapes/etape4.js   étape 4 — le marais : cinq papillons en même temps, chaque ponte suivie dans une loupe
 js/etapes/course.js   la petite course jusqu'au café, à la fin du marais (6 secondes après le départ)
 js/etapes/marais-dessins.js  dessins du marais, des plantes, chenilles, papillons, fourmis et de la loupe
 js/etapes/cafe.js     étape 5 — le café de Cyriel (textes, recettes, commandes, étals et prix en tête de fichier)
@@ -80,23 +80,25 @@ recherche de ne pas l'indexer.
 
 ### Le marais (étape 4)
 
-Un petit jeu d'arcade où tout se passe en même temps. Cinq femelles arrivent
-coup sur coup (une toutes les 2 secondes) : on touche une femelle, on dit
-qui elle est (« Quel est ce papillon ? », trois noms au choix ; son nom
-reste ensuite écrit sous elle), puis on touche sa plante hôte (elle goûte en tambourinant avec ses pattes). Chaque ponte ouvre
-une loupe en haut de l'écran, où l'œuf devient chenille puis chrysalide
-pendant qu'on s'occupe des autres. Quand une loupe clignote en rouge, il faut
-la toucher à temps. Une femelle qu'on fait trop attendre, ou un danger raté,
-coûte une vie (5 vies) ; à zéro, l'étape recommence. Les durées sont dans
-`REGLES`, en tête de `js/etapes/etape4.js`, réglées pour rester faciles.
+Tout se passe en même temps. Cinq femelles arrivent l'une après l'autre (une
+toutes les 7 secondes). On touche une femelle et on dit qui elle est
+(« Quel est ce papillon ? », trois noms au choix ; son nom reste ensuite
+écrit sous elle), puis on touche sa plante hôte (elle la goûte en
+tambourinant avec ses pattes). Après la ponte, la plante est remplacée par une
+loupe où se joue le petit jeu de l'espèce, pendant que les autres continuent.
+Une loupe qui a besoin de Cyriel brille ; la toucher l'agrandit sur place.
+Une femelle qu'on fait trop attendre, ou un danger laissé trop longtemps
+(mésange, crue, fourmis : la loupe clignote en rouge), coûte une vie (5 vies) ;
+à zéro, l'étape recommence. Les durées sont dans `REGLES`, en tête de
+`js/etapes/etape4.js`.
 
 | Papillon | Plante | Le petit jeu |
 | --- | --- | --- |
-| Paon du jour | grande ortie | ouvrir les ailes (ocelles) face à une mésange |
-| Aurore | alliaire (la cardamine porte déjà un œuf orange) | la chenille se cache contre une silique face à un oiseau |
-| Cuivré des marais | patience d'eau | grimper au-dessus de la crue d'hiver |
+| Paon du jour | grande ortie | nourrir la colonie dans sa toile ; ouvrir les ailes (ocelles) face à une mésange |
+| Aurore | alliaire (la cardamine porte déjà un œuf orange) | retrouver la chenille allongée contre une silique ; la chrysalide passe l'hiver |
+| Cuivré des marais | patience d'eau | « fenêtres » dans la feuille ; grimper au-dessus de la crue d'hiver |
 | Azuré des mouillères | gentiane pneumonanthe | choisir la fourmi qui l'adopte (Myrmica) ; réclamer à manger dans le nid |
-| Machaon | carotte sauvage | sortir les cornes orange face aux fourmis |
+| Machaon | carotte sauvage | la chenille déguisée en fiente ; sortir les cornes orange face aux fourmis |
 
 Chaque papillon ajoute une page au carnet de terrain (bouton en haut à
 gauche). Les textes et les faits sont en tête de `js/etapes/etape4.js`
