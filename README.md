@@ -167,26 +167,29 @@ En tête de `js/etapes/cafe.js` :
   (`TEXTES.commandes`) et les pseudos des joueurs du marché (`TEXTES.joueurs`) ;
 - `RECETTES` : ingrédients, gestes au fourneau et temps de cuisson, en vraies
   minutes comme dans le jeu d'origine (le bouton 60x les fait passer en autant
-  de secondes), ce que laisse le client (`prix`), l'expérience (`xp`) et
-  l'épice facultative (`epice`). Les quatre premières (salade du jardin, soupe
+  de secondes), ce que paie chaque client (`prix`, en billets, par portion),
+  l'expérience (`xp`), le nombre de portions (`portions` : une salade en fait
+  10, et trois salades s'additionnent au comptoir) et l'épice facultative
+  (`epice`). Les quatre premières (salade du jardin, soupe
   à la tomate, omelette, mousse au chocolat) viennent de la maquette du livre ;
   la mousse prend trois heures au frais, comme dans le jeu d'origine ;
 - `CLIENTS` : les joueurs du marché qui viennent manger, leur table, leur
   recette (la recette du livre, sans ingrédient en plus ou en moins). Il y a
-  trois tables : les trois derniers attendent qu'une table se
-  libère. Le dernier client, c'est Clément, avec le machaon de l'étape 4 sur
+  quatre tables : les deux derniers attendent qu'une table se libère et soit
+  débarrassée. Le dernier client, c'est Clément, avec le machaon de l'étape 4 sur
   l'épaule : il commande la spécialité ;
 - `ETALS` et `PRIX` : ce que vend chaque étal du marché, et à quel prix ;
   les épices (vanille, persil, basilic, piment, à l'épicerie ou à la roue)
-  relèvent le plat dont c'est l'épice : on la met dans la casserole, ou on
-  dit oui quand Pipistrelle la propose en cuisinant (`TEXTES.epice` : le
-  bonus) ;
-  `PIECES_DEPART` (30) : les pièces au départ. Les courses des trois premières
-  commandes coûtent 15 pièces. À zéro, on ne peut plus rien acheter : la roue
-  de la fortune et le camion du chef font regagner des pièces ; si elle ne
-  peut vraiment plus finir les commandes, Pipistrelle propose aussi de
-  recommencer la partie (sans repasser par la connexion).
-- `SEGMENTS_ROUE` : les seize cases de la roue de la fortune (des pièces ou
+  relèvent le plat dont c'est l'épice : on dit oui quand Pipistrelle la
+  propose en cuisinant (`TEXTES.epice` : le bonus) ;
+  `PIECES_DEPART` (1 200) : l'argent au départ, en billets (le compteur vert
+  en haut à gauche). Toutes les recettes de la soirée coûtent environ 1 200
+  billets d'ingrédients ; les clients paient en partant, directement au
+  compteur. Sans assez d'argent, on ne peut plus rien acheter : la roue de la
+  fortune et le camion du chef en font regagner ; si elle ne peut vraiment
+  plus finir les commandes, Pipistrelle propose aussi de recommencer la partie
+  (sans repasser par la connexion).
+- `SEGMENTS_ROUE` : les seize cases de la roue de la fortune (des billets ou
   des ingrédients) ; `TEXTES.roue`, `TEXTES.hourra`, `TEXTES.express`,
   `TEXTES.garniture` : les fenêtres des maquettes.
 - `TEXTES.fete` : la fin, où le gâteau de Clément est pour elle ; `age` donne
@@ -214,24 +217,36 @@ L'écran du restaurant reprend la maquette de Clément (912 × 1724) : les menus
 sont découpés dedans (`images/hud/`) et posés aux mêmes places, à l'échelle de
 l'écran ; la salle se cadre dans l'espace libre entre eux. Les positions des
 boutons et des textes sont en pixels de la maquette (`HUD` et `ZONES`, dans
-`js/etapes/cafe.js`). En haut : le niveau, l'expérience, les pièces, le nom,
+`js/etapes/cafe.js`). En haut : le niveau, l'expérience, l'argent (les
+billets ; le compteur de pièces d'or reste à 0), le nom, la popularité (le
+pouce vert : +0,1 à chaque client content, qui lève le pouce en partant),
 et les icônes (la note coupe le son, « ? » fait répéter Pipistrelle, le cadre
 passe en plein écran). En bas à gauche, le Café chat : Pipistrelle y parle, ses
 questions s'y affichent en boutons, et Cyriel peut y écrire. En bas à droite :
 le livre de recettes, le fouet (touche le bon fourneau à sa place) et le panier
-(le frigo). Sur un écran plus large que la maquette, les plateaux d'actions se
+(le frigo) ; dessous, la cabane mène au marché à tout moment. Sur un écran plus large que la maquette, les plateaux d'actions se
 prolongent jusqu'au bord.
 
-Dans la salle, Cyriel en cheffe (toque, tablier rose) va d'un fourneau à
-l'autre pendant la cuisson, prend les plats au comptoir et les apporte aux
-tables ; Pipistrelle, perchée près du frigo, ne sert plus : elle donne les
-conseils et discute dans le chat (et allume les bougies à la fête). Chaque
-partie commence au niveau 23 ; le gâteau de la fin fait passer au niveau 24.
+La salle suit la maquette de Clément : la porte au fond du mur de gauche, le
+grand frigo, les trois fourneaux jusqu'au bout du mur, le comptoir bleu en
+îlot devant eux, quatre tables en quinconce côté salle, les fenêtres et
+l'ardoise sur le mur de droite, les cadres photo au-dessus des fourneaux ; le
+camion du chef pâtissier est garé au bord de la rue, à droite (on le voit
+surtout en paysage). Les positions sont dans `LIEUX` et les constantes juste
+au-dessus (`TABLES`, `FEUX_J`, `COMPTOIR`…), dans `js/etapes/cafe-dessins.js`.
+Cyriel en cheffe cuisine et pose les plats au comptoir ; la serveuse (queue
+de cheval, tablier blanc) prend une portion au comptoir, l'apporte au client,
+puis débarrasse l'assiette vide quand il est parti. Pipistrelle donne les
+conseils et discute dans le chat (et allume les bougies à la fête). Quand
+Cyriel écrit dans le chat, son message s'affiche aussi dans une bulle
+au-dessus de sa tête. Chaque partie commence au niveau 23 ; le gâteau de la
+fin fait passer au niveau 24.
 
 Écran couché (téléphone en paysage, ordinateur) : les menus se placent comme
 dans le jeu d'origine. Le chat va dans le coin en bas à gauche, les plateaux
-d'actions dans le coin en bas à droite, et la salle (ou le marché) se cadre
-entre les deux. Les menus suivent alors la hauteur de l'écran. Le chat et les
+d'actions dans le coin en bas à droite ; la salle prend toute la hauteur de
+l'écran (`CADRE_CAFE_PAYSAGE`), les menus par-dessus ses coins, et le marché se
+cadre entre les menus. Les menus suivent alors la hauteur de l'écran. Le chat et les
 plateaux sont deux images (`images/hud/chat.webp` et `actions.webp`) ; le coin
 du chat, caché par les plateaux sur la maquette, a été reconstitué.
 
@@ -256,27 +271,34 @@ Les fenêtres reprennent les maquettes de Clément, traduites en français :
   frigo à droite, et les cartes des aliments sur la table en bois : le prix,
   le stock au frigo, acheter (le chariot) et revendre au même prix (la caisse,
   grise s'il n'y en a pas). Le panier du bas, au café, ouvre la même fenêtre
-  sur le frigo.
+  sur le frigo ; le panier d'une recette du livre l'ouvre sur l'étal de
+  l'ingrédient qui manque, sans quitter le café (« Boutique d'ingrédients »).
 - **Le livre de recettes** : un livre ouvert, deux cartes par page (une
   seule page sur un écran étroit, une carte par page sur un téléphone
   couché), avec les flèches bleues pour tourner les pages. Chaque carte a ses
   trois étoiles (une de plus à chaque plat servi), son plat et sa famille, les
   portions, le temps, le prix et l'expérience, les ingrédients (grisés s'il en
-  manque au frigo), l'épice dans sa case fleurie, et le panier (il manque
-  quelque chose : direction le marché) ou le fouet (tout est là).
+  manque au frigo), l'épice dans sa case fleurie. Ouvert depuis un fourneau,
+  la photo du client est sur la recette qu'il a commandée, et le bouton
+  « Cuisiner » lance la recette (ou « Boutique », le panier, s'il manque un
+  ingrédient).
 - **La roue de la fortune** (le stand PLAY du marché) : le premier tour est
-  gratuit, puis il coûte une pièce, et il est offert si la bourse est vide
+  gratuit, puis il coûte 10 billets, et il est offert si la caisse est vide
   (pour pouvoir se débloquer). Le prix s'annonce dans la fenêtre « Hourra ! » :
-  les pièces vont dans la bourse, les aliments au frigo.
+  les billets vont au compteur, les aliments au frigo.
 - **Relever le plat** : quand l'épice de la recette est au frigo, au moment de
   cuisiner, « Veux-tu relever ce plat avec de la vanille ? » ; oui : le client
-  laisse quelques pièces de plus et l'expérience monte un peu plus.
-- **Cuisiner tout de suite** : toucher un fourneau qui cuit propose de finir le
-  plat d'un coup, pour une pièce (25 fois par partie ; la toque est le bouton).
+  paie quelques billets de plus et l'expérience monte un peu plus.
+- **Cuisiner tout de suite** : toucher deux fois un fourneau qui cuit propose
+  de finir le plat d'un coup, pour 10 billets (25 fois par partie ; la toque
+  est le bouton).
 - **Trouve la garniture** : le camion du chef pâtissier est garé à droite du
   café ; on le touche, et le chef a caché de la confiture dans un de ses trois
-  cupcakes. Une partie coûte une pièce (offerte si la bourse est vide), la
-  garniture en rapporte trois.
+  cupcakes. On croque dans celui qu'on choisit (la confiture coule si c'est
+  le bon). Une partie coûte 10 billets (offerte si la caisse est vide), la
+  garniture en rapporte 30.
+- **Le tableau noir** du marché, à droite du banc : il ouvre la fenêtre des
+  permis de travail, pour le décor (rien n'y est touchable).
 
 Les images des fenêtres sont dans `images/fenetres/` (découpées dans les
 maquettes, sans leurs textes) ; les textes français et les boutons sont posés
@@ -284,12 +306,19 @@ par-dessus, en pixels de l'image (`MAQ` et `maquette()` dans
 `js/etapes/cafe.js`).
 
 Il y a trois fourneaux : pendant qu'un plat cuit, on en lance un autre.
-Toucher un fourneau libre ouvre le livre. Au-dessus du fourneau, une bulle
-parchemin demande les ingrédients, puis chaque étape (une icône) : on touche,
-et une barre à segments se remplit avec le nom de l'étape. Puis la barre sert
-de minuteur, avec le bouton 60x. Le plat prêt s'affiche dans la bulle : on
-touche pour le poser sur le comptoir. Quand plusieurs fourneaux travaillent,
-les bulles se rangent en escalier, reliées à leur fourneau par un trait.
+Toucher un fourneau libre ouvre le livre. Une fois la recette lancée, la
+bulle du fourneau montre le premier ingrédient : on la touche, Cyriel y va et
+la barre se remplit pendant qu'elle l'ajoute ; puis l'ingrédient suivant, puis
+chaque geste. On peut toucher plusieurs étapes d'affilée, sur plusieurs
+fourneaux : Cyriel les fait dans l'ordre. On voit ce qu'il y a dans la poêle
+(les ingrédients, puis le plat qui mijote). Pendant la cuisson, rien ne
+s'affiche au-dessus du fourneau : on le touche pour voir la bulle (nom du
+plat, barre en %, ce qui se passe, temps restant et bouton 60x). Prêt, le plat
+prend sa forme finale sur le fourneau : on le touche, Cyriel le pose sur le
+comptoir avec ses portions (×10…), et la serveuse sert les clients qui l'ont
+commandé. Le fourneau reste sale : un toucher, et Cyriel le nettoie en une
+seconde. Quand plusieurs fourneaux travaillent, les bulles se rangent en
+escalier, reliées à leur fourneau par un trait.
 
 Le nom du bandeau et les titres des fenêtres sont écrits en Patua One
 (`polices/`, licence OFL).
