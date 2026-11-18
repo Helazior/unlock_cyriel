@@ -112,6 +112,8 @@ Une loupe qui a besoin de Cyriel brille ; la toucher l'agrandit sur place.
 Une femelle qu'on fait trop attendre, ou un danger laissé trop longtemps
 (mésange, crue, fourmis : la loupe clignote en rouge), coûte une vie (5 vies),
 comme une mauvaise fourmi pour l'azuré ou une mauvaise silique pour l'aurore.
+Avant les œufs aussi : un mauvais nom de papillon ou une mauvaise plante
+coûte une vie.
 À zéro, l'étape recommence ; mais une fois toutes les femelles posées, les
 œufs servent de point de sauvegarde : on reprend aux loupes (le bouton « Tout
 recommencer » repart du début). Les durées sont dans `REGLES`, en tête de
